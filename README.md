@@ -1,2 +1,2 @@
-# Championship PractiBuddy
+# WinMSS Buddy
  
