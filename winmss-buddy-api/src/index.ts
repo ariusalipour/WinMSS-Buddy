@@ -1,4 +1,4 @@
-import { Competitor, Match, Registration, Squad, Score } from "./models";
+import { Competitor, Match, Registration, Squad, Score, Stage } from "./models";
 
 export default {
 	async fetch(request: Request): Promise<Response> {
@@ -14,7 +14,6 @@ export default {
 					);
 				}
 
-				// Parse form data for multiple files
 				const formData = await request.formData();
 				const files = Array.from(formData.entries())
 					.filter(([key, value]) => value instanceof File)
@@ -32,112 +31,74 @@ export default {
 				let registrationIdCounter = 1;
 				let squadIdCounter = 1;
 				let scoreIdCounter = 1;
-				let stageIdCounter = 1;
+				let uniqueStageIdCounter = 1;
 				const combinedData = {
 					competitors: [] as Competitor[],
 					matches: [] as Match[],
 					registrations: [] as Registration[],
 					squads: [] as Squad[],
 					scores: [] as Score[],
+					stages: [] as Stage[],
 				};
 
 				for (const file of files) {
 					const arrayBuffer = await file.arrayBuffer();
 					let fileContent = new TextDecoder("utf-8").decode(arrayBuffer);
 
-					// Track and update IDs with logging for debugging
 					const matchIdMap: Record<string, string> = {};
 					const memberIdMap: Record<string, string> = {};
 					const registrationIdMap: Record<string, string> = {};
 					const squadIdMap: Record<string, string> = {};
 					const scoreIdMap: Record<string, string> = {};
-					const stageIdMap: Record<string, string> = {};
 
-					fileContent = fileContent.replace(/MatchId='(\d+)'/g, (match, originalId) => {
-						if (!matchIdMap[originalId]) {
-							matchIdMap[originalId] = String(matchIdCounter++);
-						}
-						console.log(`MatchId '${originalId}' updated to '${matchIdMap[originalId]}'`);
+					fileContent = fileContent.replace(/MatchId='(\d+)'/g, (_, originalId) => {
+						if (!matchIdMap[originalId]) matchIdMap[originalId] = String(matchIdCounter++);
 						return `MatchId='${matchIdMap[originalId]}'`;
 					});
 
-					fileContent = fileContent.replace(/MemberId='(\d+)'/g, (match, originalId) => {
-						if (!memberIdMap[originalId]) {
-							memberIdMap[originalId] = String(memberIdCounter++);
-						}
-						console.log(`MemberId '${originalId}' updated to '${memberIdMap[originalId]}'`);
+					fileContent = fileContent.replace(/MemberId='(\d+)'/g, (_, originalId) => {
+						if (!memberIdMap[originalId]) memberIdMap[originalId] = String(memberIdCounter++);
 						return `MemberId='${memberIdMap[originalId]}'`;
 					});
 
-					fileContent = fileContent.replace(/CompId='(\d+)'/g, (match, originalId) => {
-						if (!registrationIdMap[originalId]) {
-							registrationIdMap[originalId] = String(registrationIdCounter++);
-						}
-						console.log(`CompId '${originalId}' updated to '${registrationIdMap[originalId]}'`);
+					fileContent = fileContent.replace(/CompId='(\d+)'/g, (_, originalId) => {
+						if (!registrationIdMap[originalId]) registrationIdMap[originalId] = String(registrationIdCounter++);
 						return `CompId='${registrationIdMap[originalId]}'`;
 					});
 
-					fileContent = fileContent.replace(/SquadId='(\d+)'/g, (match, originalId) => {
-						if (!squadIdMap[originalId]) {
-							squadIdMap[originalId] = String(squadIdCounter++);
-						}
-						console.log(`SquadId '${originalId}' updated to '${squadIdMap[originalId]}'`);
+					fileContent = fileContent.replace(/SquadId='(\d+)'/g, (_, originalId) => {
+						if (!squadIdMap[originalId]) squadIdMap[originalId] = String(squadIdCounter++);
 						return `SquadId='${squadIdMap[originalId]}'`;
 					});
 
-					fileContent = fileContent.replace(/ScoreId='(\d+)'/g, (match, originalId) => {
-						if (!scoreIdMap[originalId]) {
-							scoreIdMap[originalId] = String(scoreIdCounter++);
-						}
-						console.log(`ScoreId '${originalId}' updated to '${scoreIdMap[originalId]}'`);
+					fileContent = fileContent.replace(/ScoreId='(\d+)'/g, (_, originalId) => {
+						if (!scoreIdMap[originalId]) scoreIdMap[originalId] = String(scoreIdCounter++);
 						return `ScoreId='${scoreIdMap[originalId]}'`;
 					});
 
-					fileContent = fileContent.replace(/StageId='(\d+)'/g, (match, originalId) => {
-						if (!stageIdMap[originalId]) {
-							stageIdMap[originalId] = String(stageIdCounter++);
-						}
-						console.log(`StageId '${originalId}' updated to '${stageIdMap[originalId]}'`);
-						return `StageId='${stageIdMap[originalId]}'`;
-					});
-
-					// Process file content individually
 					const parsedData = processFile(fileContent);
 
-					// Update IDs in related objects
-					parsedData.registrations = parsedData.registrations.map((registration) => ({
-						...registration,
-						memberId: memberIdMap[registration.memberId] || registration.memberId,
-						competitorId: registrationIdMap[registration.competitorId] || registration.competitorId,
+					parsedData.stages = parsedData.stages.map((stage) => ({
+						...stage,
+						matchId: matchIdMap[stage.matchId] || stage.matchId,
+						uniqueStageId: uniqueStageIdCounter++,
 					}));
 
-					parsedData.squads = parsedData.squads.map((squad) => ({
-						...squad,
-						squadId: squadIdMap[squad.squadId] || squad.squadId,
-					}));
-
-					parsedData.scores = parsedData.scores.map((score) => ({
-						...score,
-						memberId: memberIdMap[score.memberId] || score.memberId,
-						stageId: stageIdMap[score.stageId] || score.stageId,
-					}));
-
-					// Combine parsed data into the aggregated dataset
 					combinedData.competitors.push(...parsedData.competitors);
 					combinedData.matches.push(...parsedData.matches);
 					combinedData.registrations.push(...parsedData.registrations);
 					combinedData.squads.push(...parsedData.squads);
 					combinedData.scores.push(...parsedData.scores);
+					combinedData.stages.push(...parsedData.stages);
 				}
 
-				// Return combined data
+				mergeCompetitors(combinedData);
+
 				return new Response(JSON.stringify(combinedData, null, 2), {
 					headers: { "Content-Type": "application/json" },
 				});
 			} catch (err: any) {
-				return new Response(`Error processing files: ${err.message}`, {
-					status: 500,
-				});
+				return new Response(`Error processing files: ${err.message}`, { status: 500 });
 			}
 		}
 
@@ -145,7 +106,6 @@ export default {
 	},
 };
 
-// Helper function to process raw individual file content
 function processFile(rawContent: string) {
 	const rowRegex = /<z:row\s+([^>]+)\s*\/>/g;
 	const attributeRegex = /(\w+)='([^']*)'/g;
@@ -171,7 +131,6 @@ function processFile(rawContent: string) {
 		return rows;
 	};
 
-	// Process the raw content into models
 	const competitors = parseRows(rawContent, (attributes) =>
 		"MemberId" in attributes && "Firstname" in attributes && "Lastname" in attributes
 	).map((attributes) => ({
@@ -236,5 +195,50 @@ function processFile(rawContent: string) {
 		finalScore: parseInt(attributes.FinalScore, 10),
 	}));
 
-	return { competitors, matches, registrations, squads, scores };
+	const stages = parseRows(rawContent, (attributes) =>
+		"StageId" in attributes && "MatchId" in attributes && "StageName" in attributes
+	).map((attributes) => ({
+		stageId: attributes.StageId,
+		matchId: attributes.MatchId,
+		stageName: attributes.StageName,
+		uniqueStageId: 0, // Temporary placeholder, will be set later
+	}));
+
+	return { competitors, matches, registrations, squads, scores, stages };
+}
+
+function mergeCompetitors(combinedData: {
+	competitors: Competitor[];
+	matches: Match[];
+	registrations: Registration[];
+	squads: Squad[];
+	scores: Score[];
+	stages: Stage[];
+}) {
+	const nameMap: Record<string, string> = {};
+	const mergedCompetitors: Competitor[] = [];
+
+	for (const competitor of combinedData.competitors) {
+		const fullName = `${competitor.firstname} ${competitor.lastname}`.trim();
+		if (!nameMap[fullName]) {
+			nameMap[fullName] = competitor.memberId;
+			mergedCompetitors.push(competitor);
+		} else {
+			const existingMemberId = nameMap[fullName];
+
+			combinedData.registrations.forEach((registration) => {
+				if (registration.memberId === competitor.memberId) {
+					registration.memberId = existingMemberId;
+				}
+			});
+
+			combinedData.scores.forEach((score) => {
+				if (score.memberId === competitor.memberId) {
+					score.memberId = existingMemberId;
+				}
+			});
+		}
+	}
+
+	combinedData.competitors = mergedCompetitors;
 }

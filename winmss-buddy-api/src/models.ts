@@ -52,3 +52,13 @@ export interface Score {
 	finalScore: number;
 }
 
+export interface Stage {
+	stageId: string; // Original stage ID relative to the match
+	matchId: string; // ID of the match this stage belongs to
+	stageName: string; // Name or description of the stage
+	uniqueStageId: number;
+}
+
+
+
+
