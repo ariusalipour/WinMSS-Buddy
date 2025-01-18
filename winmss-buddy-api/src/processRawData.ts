@@ -1,4 +1,4 @@
-import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge } from "./models";
+import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge, ProcessedData } from "./models";
 
 export async function handleProcessRawData(request: Request): Promise<Response> {
 	try {
@@ -78,9 +78,10 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 
 			parsedData.stages = parsedData.stages.map((stage) => ({
 				...stage,
-				matchId: matchIdMap[stage.matchId] || stage.matchId,
+				matchId: Number(matchIdMap[stage.matchId] || stage.matchId), // Ensure matchId is a number
 				uniqueStageId: uniqueStageIdCounter++,
 			}));
+
 
 			combinedData.competitors.push(...parsedData.competitors);
 			combinedData.matches.push(...parsedData.matches);
@@ -93,7 +94,17 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 		const competitorMerges = createCompetitorMerges(combinedData.competitors);
 		combinedData.competitorMerges = competitorMerges;
 
-		return new Response(JSON.stringify(combinedData, null, 2), {
+		const processedData: ProcessedData = {
+			matches: combinedData.matches,
+			stages: combinedData.stages,
+			competitors: combinedData.competitors,
+			squads: combinedData.squads,
+			registrations: combinedData.registrations,
+			scores: combinedData.scores,
+			competitorMerges: combinedData.competitorMerges,
+		};
+
+		return new Response(JSON.stringify(processedData, null, 2), {
 			headers: { "Content-Type": "application/json" },
 		});
 	} catch (err: any) {
@@ -154,11 +165,11 @@ function processFile(rawContent: string) {
 	const competitors = parseRows(rawContent, (attributes) =>
 		"MemberId" in attributes && "Firstname" in attributes && "Lastname" in attributes
 	).map((attributes) => ({
-		memberId: attributes.MemberId,
+		memberId: parseInt(attributes.MemberId, 10),
 		lastname: attributes.Lastname,
 		firstname: attributes.Firstname,
-		regionId: attributes.RegionId,
-		classId: attributes.ClassId,
+		regionId: attributes.RegionId ? parseInt(attributes.RegionId, 10) : undefined,
+		classId: attributes.ClassId ? parseInt(attributes.ClassId, 10) : undefined,
 		inactive: attributes.InActive === "True",
 		female: attributes.Female === "True",
 		register: attributes.Register === "True",
@@ -167,43 +178,43 @@ function processFile(rawContent: string) {
 	const matches = parseRows(rawContent, (attributes) =>
 		"MatchId" in attributes && "MatchName" in attributes
 	).map((attributes) => ({
-		matchId: attributes.MatchId,
+		matchId: parseInt(attributes.MatchId, 10),
 		matchName: attributes.MatchName,
 		matchDate: attributes.MatchDt,
 		matchLevel: attributes.MatchLevel,
-		countryId: attributes.CountryId,
+		countryId: parseInt(attributes.CountryId, 10),
 		squadCount: parseInt(attributes.SquadCount, 10),
 	}));
 
 	const registrations = parseRows(rawContent, (attributes) =>
 		"CompId" in attributes && "DivId" in attributes
 	).map((attributes) => ({
-		matchId: attributes.MatchId,
-		memberId: attributes.MemberId,
-		competitorId: attributes.CompId,
-		divisionId: attributes.DivId,
-		categoryId: attributes.CatId,
-		squadId: attributes.SquadId,
+		matchId: parseInt(attributes.MatchId, 10),
+		memberId: parseInt(attributes.MemberId, 10),
+		competitorId: parseInt(attributes.CompId, 10),
+		divisionId: parseInt(attributes.DivId, 10),
+		categoryId: parseInt(attributes.CatId, 10),
+		squadId: parseInt(attributes.SquadId, 10),
 		isDisqualified: attributes.IsDisq === "True",
-		disqualificationReason: attributes.DisqRuleId ? attributes.DisqRuleId : undefined,
-		disqualificationDate: attributes.DisqDt ? attributes.DisqDt : undefined,
-		disqualificationMemo: attributes.DisqMemo ? attributes.DisqMemo : undefined,
+		disqualificationReason: attributes.DisqRuleId || undefined,
+		disqualificationDate: attributes.DisqDt || undefined,
+		disqualificationMemo: attributes.DisqMemo || undefined,
 	}));
 
 	const squads = parseRows(rawContent, (attributes) =>
 		"SquadId" in attributes && "Squad" in attributes
 	).map((attributes) => ({
-		matchId: attributes.MatchId,
-		squadId: attributes.SquadId,
+		matchId: parseInt(attributes.MatchId, 10),
+		squadId: parseInt(attributes.SquadId, 10),
 		squadName: attributes.Squad,
 	}));
 
 	const scores = parseRows(rawContent, (attributes) =>
 		"StageId" in attributes && "ScoreA" in attributes
 	).map((attributes) => ({
-		matchId: attributes.MatchId,
-		stageId: attributes.StageId,
-		memberId: attributes.MemberId,
+		matchId: parseInt(attributes.MatchId, 10),
+		stageId: parseInt(attributes.StageId, 10),
+		memberId: parseInt(attributes.MemberId, 10),
 		scoreA: parseInt(attributes.ScoreA, 10),
 		scoreB: parseInt(attributes.ScoreB, 10),
 		scoreC: parseInt(attributes.ScoreC, 10),
@@ -218,8 +229,8 @@ function processFile(rawContent: string) {
 	const stages = parseRows(rawContent, (attributes) =>
 		"StageId" in attributes && "MatchId" in attributes && "StageName" in attributes
 	).map((attributes) => ({
-		stageId: attributes.StageId,
-		matchId: attributes.MatchId,
+		stageId: parseInt(attributes.StageId, 10),
+		matchId: parseInt(attributes.MatchId, 10),
 		stageName: attributes.StageName,
 		uniqueStageId: 0, // Temporary placeholder, will be set later
 	}));

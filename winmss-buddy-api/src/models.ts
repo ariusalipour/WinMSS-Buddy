@@ -63,3 +63,13 @@ export interface CompetitorMerge {
 	memberId: number; // The main member ID
 	mergeMemberIds: number[]; // Array of member IDs to merge into the main member ID
 }
+
+export interface ProcessedData {
+	matches: Match[];
+	stages: Stage[];
+	competitors: Competitor[];
+	squads: Squad[];
+	registrations: Registration[];
+	scores: Score[];
+	competitorMerges: CompetitorMerge[];
+}
