@@ -4,10 +4,8 @@ export async function handleCreateChampionshipResults(request: Request): Promise
 	try {
 		const requestData: ProcessedData = await request.json();
 
-		// Calculate championship results
 		const championshipResults = calculateChampionshipResults(requestData);
 
-		// Create the response object
 		const response: ChampionshipResultsResponse = {
 			metadata: {
 				totalCompetitors: championshipResults.length,
@@ -25,9 +23,8 @@ export async function handleCreateChampionshipResults(request: Request): Promise
 }
 
 function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[] {
-	const { scores, competitors, matches } = data;
+	const { scores, competitors, matches, registrations } = data;
 
-	// Validate scores and remove entries with null memberId
 	const validScores = scores.filter((score) => {
 		if (!score.memberId) {
 			console.warn(`Invalid score entry with null memberId:`, score);
@@ -36,7 +33,6 @@ function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[]
 		return true;
 	});
 
-	// Group scores by memberId and then by matchId
 	const groupedScores: Record<number, Record<number, Score[]>> = {};
 
 	validScores.forEach((score) => {
@@ -49,7 +45,6 @@ function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[]
 		groupedScores[score.memberId][score.matchId].push(score);
 	});
 
-	// Calculate results
 	const championshipResults: ChampionshipResult[] = Object.entries(groupedScores).map(
 		([memberIdStr, matchScores]) => {
 			const memberId = parseInt(memberIdStr, 10);
@@ -64,10 +59,42 @@ function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[]
 			let totalShootTime = 0;
 			let totalFinalScore = 0;
 
+			const divisionId = registrations.find((r) => r.memberId === memberId)?.divisionId || undefined;
+			const categoryId = registrations.find((r) => r.memberId === memberId)?.categoryId || undefined;
+
 			const matchResults: MatchResult[] = Object.entries(matchScores).reduce(
 				(acc, [matchIdStr, scores]) => {
 					const matchId = parseInt(matchIdStr, 10);
 					const match = matches.find((m) => m.matchId === matchId);
+
+					const registration = registrations.find(
+						(r) => r.matchId === matchId && r.memberId === memberId
+					);
+
+					const isDisqualified = registration?.isDisqualified || false;
+					const disqualificationReason = isDisqualified ? registration?.disqualificationReason : undefined;
+					const disqualificationDate = isDisqualified ? registration?.disqualificationDate : undefined;
+					const disqualificationMemo = isDisqualified ? registration?.disqualificationMemo : undefined;
+
+					if (isDisqualified) {
+						acc.push({
+							matchId,
+							matchName: match?.matchName || "Unknown Match",
+							scoreA: 0,
+							scoreB: 0,
+							scoreC: 0,
+							scoreD: 0,
+							misses: 0,
+							penalties: 0,
+							shootTime: 0,
+							finalScore: 0,
+							isDisqualified,
+							disqualificationReason,
+							disqualificationDate,
+							disqualificationMemo,
+						});
+						return acc;
+					}
 
 					const matchScoreA = scores.reduce((sum, s) => sum + s.scoreA, 0);
 					const matchScoreB = scores.reduce((sum, s) => sum + s.scoreB, 0);
@@ -98,6 +125,7 @@ function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[]
 						penalties: matchPenalties,
 						shootTime: matchShootTime,
 						finalScore: matchFinalScore,
+						isDisqualified: false,
 					});
 
 					return acc;
@@ -110,6 +138,8 @@ function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[]
 				firstname: competitor?.firstname || "Unknown",
 				lastname: competitor?.lastname || "Unknown",
 				regionId: competitor?.regionId || undefined,
+				divisionId, // New property
+				categoryId, // New property
 				totalScoreA,
 				totalScoreB,
 				totalScoreC,

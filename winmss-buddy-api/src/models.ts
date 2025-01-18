@@ -85,13 +85,19 @@ export interface MatchResult {
 	penalties: number;
 	shootTime: number;
 	finalScore: number;
+	isDisqualified: boolean;
+	disqualificationReason?: string;
+	disqualificationDate?: string;
+	disqualificationMemo?: string;
 }
 
 export interface ChampionshipResult {
 	memberId: number;
 	firstname: string;
 	lastname: string;
-	regionId?: number | null;
+	regionId?: number;
+	divisionId?: number; // New property
+	categoryId?: number; // New property
 	totalScoreA: number;
 	totalScoreB: number;
 	totalScoreC: number;
@@ -100,7 +106,7 @@ export interface ChampionshipResult {
 	totalPenalties: number;
 	totalShootTime: number;
 	totalFinalScore: number;
-	matchResults: MatchResult[]; // Array of match-level results
+	matchResults: MatchResult[];
 }
 
 export interface ChampionshipResultsResponse {
@@ -110,4 +116,3 @@ export interface ChampionshipResultsResponse {
 	};
 	results: ChampionshipResult[];
 }
-
