@@ -73,3 +73,41 @@ export interface ProcessedData {
 	scores: Score[];
 	competitorMerges: CompetitorMerge[];
 }
+
+export interface MatchResult {
+	matchId: number;
+	matchName: string;
+	scoreA: number;
+	scoreB: number;
+	scoreC: number;
+	scoreD: number;
+	misses: number;
+	penalties: number;
+	shootTime: number;
+	finalScore: number;
+}
+
+export interface ChampionshipResult {
+	memberId: number;
+	firstname: string;
+	lastname: string;
+	regionId?: number | null;
+	totalScoreA: number;
+	totalScoreB: number;
+	totalScoreC: number;
+	totalScoreD: number;
+	totalMisses: number;
+	totalPenalties: number;
+	totalShootTime: number;
+	totalFinalScore: number;
+	matchResults: MatchResult[]; // Array of match-level results
+}
+
+export interface ChampionshipResultsResponse {
+	metadata: {
+		totalCompetitors: number;
+		totalMatches: number;
+	};
+	results: ChampionshipResult[];
+}
+
