@@ -1,4 +1,4 @@
-import { Competitor, Match, Registration, Squad, Score, Stage } from "./models";
+import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge } from "./models";
 
 export default {
 	async fetch(request: Request): Promise<Response> {
@@ -39,6 +39,7 @@ export default {
 					squads: [] as Squad[],
 					registrations: [] as Registration[],
 					scores: [] as Score[],
+					competitorMerges: [] as CompetitorMerge[],
 				};
 
 				for (const file of files) {
@@ -92,7 +93,8 @@ export default {
 					combinedData.stages.push(...parsedData.stages);
 				}
 
-				mergeCompetitors(combinedData);
+				const competitorMerges = createCompetitorMerges(combinedData.competitors);
+				combinedData.competitorMerges = competitorMerges;
 
 				return new Response(JSON.stringify(combinedData, null, 2), {
 					headers: { "Content-Type": "application/json" },
@@ -207,38 +209,27 @@ function processFile(rawContent: string) {
 	return { matches, stages, competitors, squads, registrations, scores };
 }
 
-function mergeCompetitors(combinedData: {
-	competitors: Competitor[];
-	matches: Match[];
-	registrations: Registration[];
-	squads: Squad[];
-	scores: Score[];
-	stages: Stage[];
-}) {
-	const nameMap: Record<string, string> = {};
-	const mergedCompetitors: Competitor[] = [];
+function createCompetitorMerges(competitors: Competitor[]): CompetitorMerge[] {
+	const merges: CompetitorMerge[] = [];
+	const keyMap: Record<string, Competitor[]> = {};
 
-	for (const competitor of combinedData.competitors) {
-		const fullName = `${competitor.firstname} ${competitor.lastname}`.trim();
-		if (!nameMap[fullName]) {
-			nameMap[fullName] = String(competitor.memberId);
-			mergedCompetitors.push(competitor);
-		} else {
-			const existingMemberId = nameMap[fullName];
+	for (const competitor of competitors) {
+		const key = `${competitor.lastname}-${competitor.firstname.charAt(0).toUpperCase()}`;
+		if (!keyMap[key]) {
+			keyMap[key] = [];
+		}
+		keyMap[key].push(competitor);
+	}
 
-			combinedData.registrations.forEach((registration) => {
-				if (registration.memberId === competitor.memberId) {
-					registration.memberId = Number(existingMemberId);
-				}
-			});
-
-			combinedData.scores.forEach((score) => {
-				if (score.memberId === competitor.memberId) {
-					score.memberId = Number(existingMemberId);
-				}
+	for (const [key, group] of Object.entries(keyMap)) {
+		if (group.length > 1) {
+			const [main, ...rest] = group;
+			merges.push({
+				memberId: main.memberId,
+				mergeMemberIds: rest.map((competitor) => competitor.memberId),
 			});
 		}
 	}
 
-	combinedData.competitors = mergedCompetitors;
+	return merges;
 }

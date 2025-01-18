@@ -58,3 +58,8 @@ export interface Stage {
 	stageName: string;
 	uniqueStageId: number;
 }
+
+export interface CompetitorMerge {
+	memberId: number; // The main member ID
+	mergeMemberIds: number[]; // Array of member IDs to merge into the main member ID
+}
