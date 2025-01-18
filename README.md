@@ -19,7 +19,6 @@ The **WinMSS Buddy Solution** provides tools for processing data from the WinMSS
 ### Web Application
 - **Interactive Dashboard**: View championship results with sorting and filtering.
 - **Competitor Management**: Merge duplicate competitors and update information.
-- **Match Insights**: Visualize match-level performance data.
 - **File Upload**: Upload `.cab` files for processing directly through the web interface.
 
 ---
