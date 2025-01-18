@@ -1,30 +1,30 @@
 export interface Competitor {
-	memberId: string;
+	memberId: number;
 	lastname: string;
 	firstname: string;
-	regionId?: string;
-	classId?: string;
+	regionId?: number;
+	classId?: number;
 	inactive?: boolean;
 	female?: boolean;
 	register?: boolean;
 }
 
 export interface Match {
-	matchId: string;
+	matchId: number;
 	matchName: string;
 	matchDate: string;
 	matchLevel: string;
-	countryId: string;
+	countryId: number;
 	squadCount: number;
 }
 
 export interface Registration {
-	matchId: string;
-	memberId: string;
-	competitorId: string;
-	divisionId: string;
-	categoryId: string;
-	squadId: string;
+	matchId: number;
+	memberId: number;
+	competitorId: number;
+	divisionId: number;
+	categoryId: number;
+	squadId: number;
 	isDisqualified: boolean;
 	disqualificationReason?: string;
 	disqualificationDate?: string;
@@ -32,15 +32,15 @@ export interface Registration {
 }
 
 export interface Squad {
-	matchId: string;
-	squadId: string;
+	matchId: number;
+	squadId: number;
 	squadName: string;
 }
 
 export interface Score {
-	matchId: string;
-	stageId: string;
-	memberId: string;
+	matchId: number;
+	stageId: number;
+	memberId: number;
 	scoreA: number;
 	scoreB: number;
 	scoreC: number;
@@ -53,12 +53,8 @@ export interface Score {
 }
 
 export interface Stage {
-	stageId: string; // Original stage ID relative to the match
-	matchId: string; // ID of the match this stage belongs to
-	stageName: string; // Name or description of the stage
+	stageId: number;
+	matchId: number;
+	stageName: string;
 	uniqueStageId: number;
 }
-
-
-
-

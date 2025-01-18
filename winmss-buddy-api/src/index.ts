@@ -33,12 +33,12 @@ export default {
 				let scoreIdCounter = 1;
 				let uniqueStageIdCounter = 1;
 				const combinedData = {
-					competitors: [] as Competitor[],
 					matches: [] as Match[],
-					registrations: [] as Registration[],
-					squads: [] as Squad[],
-					scores: [] as Score[],
 					stages: [] as Stage[],
+					competitors: [] as Competitor[],
+					squads: [] as Squad[],
+					registrations: [] as Registration[],
+					scores: [] as Score[],
 				};
 
 				for (const file of files) {
@@ -204,7 +204,7 @@ function processFile(rawContent: string) {
 		uniqueStageId: 0, // Temporary placeholder, will be set later
 	}));
 
-	return { competitors, matches, registrations, squads, scores, stages };
+	return { matches, stages, competitors, squads, registrations, scores };
 }
 
 function mergeCompetitors(combinedData: {
@@ -221,20 +221,20 @@ function mergeCompetitors(combinedData: {
 	for (const competitor of combinedData.competitors) {
 		const fullName = `${competitor.firstname} ${competitor.lastname}`.trim();
 		if (!nameMap[fullName]) {
-			nameMap[fullName] = competitor.memberId;
+			nameMap[fullName] = String(competitor.memberId);
 			mergedCompetitors.push(competitor);
 		} else {
 			const existingMemberId = nameMap[fullName];
 
 			combinedData.registrations.forEach((registration) => {
 				if (registration.memberId === competitor.memberId) {
-					registration.memberId = existingMemberId;
+					registration.memberId = Number(existingMemberId);
 				}
 			});
 
 			combinedData.scores.forEach((score) => {
 				if (score.memberId === competitor.memberId) {
-					score.memberId = existingMemberId;
+					score.memberId = Number(existingMemberId);
 				}
 			});
 		}
