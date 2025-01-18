@@ -7,7 +7,46 @@ The **WinMSS Buddy API** is designed to process and transform data from the WinM
 
 ## API Endpoints
 
-### 1. **Raw Data Endpoint**
+### 1. **Root Endpoint**
+#### **Description:**
+Provides a quick summary of the API and its available endpoints.
+
+#### **Endpoint:**
+```http
+GET /
+```
+
+#### **Response:**
+- **Type:** JSON
+- **Format:**
+```json
+{
+  "name": "WinMSS Buddy API",
+  "description": "API for managing and calculating championship results.",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/process/raw-data",
+      "description": "Processes raw match data to generate structured JSON."
+    },
+    {
+      "method": "POST",
+      "path": "/process/merge-competitors-data",
+      "description": "Handles competitor merges by updating all related data."
+    },
+    {
+      "method": "POST",
+      "path": "/process/create-championship-results",
+      "description": "Generates championship results by aggregating scores across matches."
+    }
+  ]
+}
+```
+
+---
+
+### 2. **Raw Data Endpoint**
 #### **Description:**
 Converts a `.cab` file from WinMSS into a structured JSON dataset.
 
@@ -56,13 +95,13 @@ POST /process/raw-data
 
 ---
 
-### 2. **Competitor Correction Endpoint**
+### 3. **Competitor Correction Endpoint**
 #### **Description:**
 Accepts JSON datasets and competitor pairings to correct mismatched competitor names across matches.
 
 #### **Endpoint:**
 ```http
-POST /process/correct-competitors
+POST /process/merge-competitors-data
 ```
 
 #### **Request:**
@@ -141,13 +180,13 @@ POST /process/correct-competitors
 
 ---
 
-### 3. **Championship Results Generation**
+### 4. **Championship Results Generation**
 #### **Description:**
 Generates consolidated championship results by combining and analyzing results across multiple matches and stages.
 
 #### **Endpoint:**
 ```http
-POST /process/championship-results
+POST /process/create-championship-results
 ```
 
 #### **Request:**
@@ -222,7 +261,6 @@ POST /process/championship-results
 - **Extract Data:** Convert `.cab` files from WinMSS into a user-friendly JSON format.
 - **Correct Competitor Names:** Standardize competitor names across matches using pairings.
 - **Generate Championship Results:** Consolidate results across matches to produce championship leaderboards.
-- **Detailed Results:** Include comprehensive hit breakdowns for performance analysis.
 
 ---
 
@@ -245,6 +283,11 @@ POST /process/championship-results
 
 ## Example Usage
 
+### Root Endpoint:
+```bash
+curl -X GET http://localhost:3000/
+```
+
 ### Raw Data Endpoint:
 ```bash
 curl -X POST -F "file=@path/to/file.cab" http://localhost:3000/process/raw-data
@@ -252,12 +295,12 @@ curl -X POST -F "file=@path/to/file.cab" http://localhost:3000/process/raw-data
 
 ### Competitor Correction Endpoint:
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"datasets": [...], "pairings": {...}}' http://localhost:3000/process/correct-competitors
+curl -X POST -H "Content-Type: application/json" -d '{"datasets": [...], "pairings": {...}}' http://localhost:3000/process/merge-competitors-data
 ```
 
 ### Championship Results Generation:
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"datasets": [...]} http://localhost:3000/process/championship-results
+curl -X POST -H "Content-Type: application/json" -d '{"datasets": [...]} http://localhost:3000/process/create-championship-results
 ```
 
 ---
@@ -269,4 +312,3 @@ MIT
 
 ## Contribution
 Feel free to contribute by submitting issues or pull requests to enhance the functionality of the **WinMSS Buddy API**.
-
