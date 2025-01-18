@@ -1,7 +1,7 @@
-# WinMSS Buddy Solution
+# WinMSS Buddy
 
 ## Overview
-The **WinMSS Buddy Solution** provides tools for processing data from the WinMSS system, correcting competitor information, generating championship results, and managing and visualizing data through a web application.
+The **WinMSS Buddy** provides tools for processing data from the WinMSS system, correcting competitor information, generating championship results, and managing and visualizing data through a web application.
 
 ### Components
 - **API**: Processes and manages WinMSS data.
