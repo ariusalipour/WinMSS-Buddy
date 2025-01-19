@@ -2,25 +2,15 @@ import { useState } from "react";
 import { Layout, Table, Upload, Button, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { uploadRawData } from "./services/api";
+import {Match} from "./models.ts";
 
 const { Header, Content, Footer } = Layout;
-
-interface Match {
-    matchName: string;
-    stages: any[];
-}
 
 const columns = [
     {
         title: "Match Name",
         dataIndex: "matchName",
         key: "matchName",
-    },
-    {
-        title: "Number of Stages",
-        dataIndex: "stages",
-        key: "stages",
-        render: (stages: any[]) => stages.length,
     },
 ];
 
@@ -32,7 +22,8 @@ function App() {
         setLoading(true);
         try {
             const response = await uploadRawData(file);
-            setMatches(response); // Assuming the response is an array of matches
+            console.log(`DEBUG: ${JSON.stringify(response.matches)}`);
+            setMatches(response.matches); // Assuming the response is an array of matches
             message.success("File uploaded and processed successfully!");
         } catch (error) {
             console.error("Error uploading file:", error);
@@ -76,7 +67,7 @@ function App() {
                 </div>
             </Content>
             <Footer style={{ textAlign: "center" }}>
-                WinMSS Buddy ©2025 Created by [Your Name]
+                WinMSS Buddy ©2025 Created by Chamber Check
             </Footer>
         </Layout>
     );
