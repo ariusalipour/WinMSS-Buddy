@@ -1,14 +1,12 @@
 import axios from "axios";
-import {ProcessedData} from "../models.ts";
+import { ProcessedData } from "../models";
+
 const API_BASE_URL = "https://winmss-buddy-api.chambercheck.app"; // Update to your API base URL
 
-export const uploadRawData = async (file: File): Promise<ProcessedData> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
+export const uploadRawData = async (formData: FormData): Promise<ProcessedData> => {
     const response = await axios.post(`${API_BASE_URL}/process/raw-data`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
 
-    return await response.data; // Ensure the API returns an array of matches
+    return response.data; // Assuming the API returns `ProcessedData`
 };

@@ -1,24 +1,29 @@
 import React from "react";
 import { Table } from "antd";
+import { useAppContext } from "../context/AppContext";
 
 const ResultsView: React.FC = () => {
-    const results = [
-        { key: "1", name: "John Doe", points: 300 },
-        { key: "2", name: "Jane Smith", points: 250 },
+    const { championshipResults } = useAppContext();
+
+    const columns = [
+        { title: "Last Name", dataIndex: "lastname", key: "lastname" },
+        { title: "First Name", dataIndex: "firstname", key: "firstname" },
+        { title: "Total Score", dataIndex: "totalScore", key: "totalScore" },
     ];
 
     return (
         <div>
             <h2>Championship Results</h2>
-    <Table
-    dataSource={results}
-    columns={[
-            { title: "Name", dataIndex: "name" },
-    { title: "Points", dataIndex: "points" },
-]}
-    />
-    </div>
-);
+            <Table
+                dataSource={(championshipResults || []).map((result, index) => ({
+                    ...result,
+                    key: index,
+                }))}
+                columns={columns}
+                bordered
+            />
+        </div>
+    );
 };
 
 export default ResultsView;
