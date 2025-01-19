@@ -2,8 +2,8 @@ export interface Competitor {
 	memberId: number;
 	lastname: string;
 	firstname: string;
-	regionId?: number;
-	classId?: number;
+	regionId?: string;
+	classId?: string;
 	inactive?: boolean;
 	female?: boolean;
 	register?: boolean;
