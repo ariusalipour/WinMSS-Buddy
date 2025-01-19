@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Layout, Table, Upload, Button, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { uploadRawData } from "./services/api";
