@@ -13,7 +13,7 @@ const MatchesView: React.FC = () => {
 
     return (
         <div>
-            <h2>View Matches</h2>
+            <h2>Matches</h2>
             <Tabs>
                 {processedData.matches.map((match, matchIndex) => (
                     <TabPane tab={match.matchName} key={`match-${matchIndex}`}>
@@ -27,18 +27,30 @@ const MatchesView: React.FC = () => {
                                             const competitor = processedData.competitors.find(
                                                 (comp) => comp.memberId === reg.memberId
                                             );
+
+                                            const squad = processedData.squads.find(
+                                                (squad) => squad.squadId === reg.squadId
+                                            );
+
                                             return competitor
                                                 ? {
-                                                    ...competitor,
-                                                    registrationId: reg.competitorId, // Optional registration data
+                                                    firstName: competitor.firstname,
+                                                    lastName: competitor.lastname,
+                                                    division: reg.divisionId,
+                                                    category: reg.categoryId,
+                                                    region: competitor.regionId,
+                                                    squadName: squad?.squadName || "N/A",
                                                 }
                                                 : null;
                                         })
                                         .filter((item) => item !== null)}
                                     columns={[
-                                        { title: "Competitor Name", dataIndex: "name", key: "name" },
+                                        { title: "First Name", dataIndex: "firstName", key: "firstName" },
+                                        { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+                                        { title: "Division", dataIndex: "division", key: "division" },
+                                        { title: "Category", dataIndex: "category", key: "category" },
                                         { title: "Region", dataIndex: "region", key: "region" },
-                                        { title: "Registration ID", dataIndex: "registrationId", key: "registrationId" },
+                                        { title: "Squad", dataIndex: "squadName", key: "squadName" },
                                     ]}
                                     bordered
                                 />
