@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from "react";
+import { Layout, Table, Upload, Button, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { uploadRawData } from "./services/api";
 
-function App() {
-  const [count, setCount] = useState(0)
+const { Header, Content, Footer } = Layout;
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+interface Match {
+    matchName: string;
+    stages: any[];
 }
 
-export default App
+const columns = [
+    {
+        title: "Match Name",
+        dataIndex: "matchName",
+        key: "matchName",
+    },
+    {
+        title: "Number of Stages",
+        dataIndex: "stages",
+        key: "stages",
+        render: (stages: any[]) => stages.length,
+    },
+];
+
+function App() {
+    const [matches, setMatches] = useState<Match[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const handleUpload = async (file: File) => {
+        setLoading(true);
+        try {
+            const response = await uploadRawData(file);
+            setMatches(response); // Assuming the response is an array of matches
+            message.success("File uploaded and processed successfully!");
+        } catch (error) {
+            console.error("Error uploading file:", error);
+            message.error("Failed to process the file.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <Layout>
+            <Header style={{ color: "white", fontSize: "20px" }}>
+                WinMSS Buddy Dashboard
+            </Header>
+            <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
+                <div style={{ padding: 24, background: "#fff" }}>
+                    <h2>Upload and Process Data</h2>
+                    <Upload
+                        beforeUpload={(file) => {
+                            handleUpload(file);
+                            return false; // Prevent default upload
+                        }}
+                        showUploadList={false}
+                    >
+                        <Button icon={<UploadOutlined />} type="primary">
+                            Upload .cab File
+                        </Button>
+                    </Upload>
+                    <div style={{ marginTop: 24 }}>
+                        <h3>Matches</h3>
+                        <Table
+                            dataSource={matches.map((match, index) => ({
+                                ...match,
+                                key: index,
+                            }))}
+                            columns={columns}
+                            loading={loading}
+                            bordered
+                        />
+                    </div>
+                </div>
+            </Content>
+            <Footer style={{ textAlign: "center" }}>
+                WinMSS Buddy ©2025 Created by [Your Name]
+            </Footer>
+        </Layout>
+    );
+}
+
+export default App;
