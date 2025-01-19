@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import { ProcessedData, ChampionshipResult } from "../models";
+import { ProcessedData, ChampionshipResult } from "../../../winmss-buddy-api/src/models.ts";
 
 interface AppContextProps {
     processedData: ProcessedData | null;

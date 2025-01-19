@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ProcessedData } from "../models";
+import { ProcessedData } from "../../../winmss-buddy-api/src/models.ts";
 
 const API_BASE_URL = "https://winmss-buddy-api.chambercheck.app"; // Update to your API base URL
 
