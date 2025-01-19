@@ -15,7 +15,7 @@ import {
     InfoCircleOutlined,
 } from "@ant-design/icons";
 import UploadView from "./views/UploadView";
-import ViewView from "./views/ViewView";
+import MatchesView from "./views/MatchesView.tsx";
 import MergeView from "./views/MergeView";
 import ResultsView from "./views/ResultsView";
 import InfoView from "./views/InfoView";
@@ -37,7 +37,7 @@ const App: React.FC = () => {
         {
             key: "2",
             icon: <UnorderedListOutlined />,
-            label: <Link to="/view">View</Link>,
+            label: <Link to="/view">Matches</Link>,
         },
         {
             key: "3",
@@ -106,7 +106,7 @@ const App: React.FC = () => {
                         >
                             <Routes>
                                 <Route path="/" element={<UploadView />} />
-                                <Route path="/view" element={<ViewView />} />
+                                <Route path="/view" element={<MatchesView />} />
                                 <Route path="/merge" element={<MergeView />} />
                                 <Route path="/results" element={<ResultsView />} />
                                 <Route path="/info" element={<InfoView />} />

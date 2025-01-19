@@ -4,7 +4,7 @@ import { useAppContext } from "../context/AppContext";
 
 const { TabPane } = Tabs;
 
-const ViewView: React.FC = () => {
+const MatchesView: React.FC = () => {
     const { processedData } = useAppContext();
 
     if (!processedData?.matches || processedData.matches.length === 0) {
@@ -94,4 +94,4 @@ const ViewView: React.FC = () => {
     );
 };
 
-export default ViewView;
+export default MatchesView;
