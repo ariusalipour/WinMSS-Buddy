@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "antd";
-import { Score } from "../../../../winmss-buddy-api/src/models/score";
+import { Score } from "../../../../winmss-buddy-api/src/models/Score";
 import { StageModel } from "../../models";
 import {Stage} from "../../../../winmss-buddy-api/src/models/Stage.ts"; // Import StageModel
 
