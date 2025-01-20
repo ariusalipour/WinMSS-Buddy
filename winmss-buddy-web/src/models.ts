@@ -6,14 +6,14 @@ export interface SquadModel {
 
 export interface ScoreModel {
     position: number;
-    stageNumber: string | number;
+    stageNumber: number;
     firstName: string;
     lastName: string;
-    division: string | number;
-    category: string | number;
+    division: string;
+    category: string;
     percentage: string;
-    time: string | number;
-    stagePoints: string | number;
+    time: number;
+    stagePoints: number;
     hitFactor: string;
     alpha: number;
     beta: number;
