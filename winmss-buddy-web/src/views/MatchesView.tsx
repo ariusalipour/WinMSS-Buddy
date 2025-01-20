@@ -165,7 +165,7 @@ const MatchesView: React.FC = () => {
                                             })}
                                         columns={[
                                             {
-                                                title: "Squad Name",
+                                                title: "Squad Name/No",
                                                 dataIndex: "squadName",
                                                 key: "squadName",
                                                 sorter: (a, b) => a.squadName.localeCompare(b.squadName),
