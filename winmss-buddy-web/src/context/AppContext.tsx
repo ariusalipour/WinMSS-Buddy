@@ -1,9 +1,9 @@
 import React, { createContext, useState, useContext } from "react";
-import { ProcessedData, ChampionshipResult } from "../../../winmss-buddy-api/src/models.ts";
+import { MatchesResults, ChampionshipResult } from "../../../winmss-buddy-api/src/models.ts";
 
 interface AppContextProps {
-    processedData: ProcessedData | null;
-    setProcessedData: (data: ProcessedData) => void;
+    processedData: MatchesResults | null;
+    setProcessedData: (data: MatchesResults) => void;
     championshipResults: ChampionshipResult[] | null;
     setChampionshipResults: (results: ChampionshipResult[]) => void;
 }
@@ -11,7 +11,7 @@ interface AppContextProps {
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [processedData, setProcessedData] = useState<ProcessedData | null>(null);
+    const [processedData, setProcessedData] = useState<MatchesResults | null>(null);
     const [championshipResults, setChampionshipResults] = useState<ChampionshipResult[] | null>(null);
 
     return (

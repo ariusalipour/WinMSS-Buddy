@@ -1,8 +1,8 @@
-import { ProcessedData, CompetitorMerge } from "./models";
+import { MatchesResults, CompetitorMerge } from "./models";
 
 export async function handleMergeCompetitorsData(request: Request): Promise<Response> {
 	try {
-		const requestData: ProcessedData = await request.json();
+		const requestData: MatchesResults = await request.json();
 
 		// Create a map of all mergeMemberIds pointing to their associated memberId
 		const mergeMap: Record<number, number> = {};
@@ -32,7 +32,7 @@ export async function handleMergeCompetitorsData(request: Request): Promise<Resp
 		const updatedCompetitorMerges = recalculateCompetitorMerges(updatedCompetitors, mergeMap);
 
 		// Construct the updated ProcessedData response
-		const updatedData: ProcessedData = {
+		const updatedData: MatchesResults = {
 			matches: requestData.matches,
 			stages: requestData.stages,
 			competitors: updatedCompetitors,
@@ -52,7 +52,7 @@ export async function handleMergeCompetitorsData(request: Request): Promise<Resp
 }
 
 function recalculateCompetitorMerges(
-	competitors: ProcessedData["competitors"],
+	competitors: MatchesResults["competitors"],
 	mergeMap: Record<number, number>
 ): CompetitorMerge[] {
 	const merges: CompetitorMerge[] = [];

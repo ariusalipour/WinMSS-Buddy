@@ -64,7 +64,7 @@ export interface CompetitorMerge {
 	mergeMemberIds: number[]; // Array of member IDs to merge into the main member ID
 }
 
-export interface ProcessedData {
+export interface MatchesResults {
 	matches: Match[];
 	stages: Stage[];
 	competitors: Competitor[];
@@ -95,9 +95,9 @@ export interface ChampionshipResult {
 	memberId: number;
 	firstname: string;
 	lastname: string;
-	regionId?: number;
-	divisionId?: number; // New property
-	categoryId?: number; // New property
+	regionId: string | undefined;
+	divisionId: number | undefined;
+	categoryId: number | undefined;
 	totalScoreA: number;
 	totalScoreB: number;
 	totalScoreC: number;
@@ -106,7 +106,7 @@ export interface ChampionshipResult {
 	totalPenalties: number;
 	totalShootTime: number;
 	totalFinalScore: number;
-	matchResults: MatchResult[];
+	matchResults: MatchResult[]
 }
 
 export interface ChampionshipResultsResponse {

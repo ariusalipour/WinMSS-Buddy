@@ -1,8 +1,8 @@
-import { ProcessedData, ChampionshipResultsResponse, ChampionshipResult, MatchResult, Score } from "./models";
+import { MatchesResults, ChampionshipResultsResponse, ChampionshipResult, MatchResult, Score } from "./models";
 
 export async function handleCreateChampionshipResults(request: Request): Promise<Response> {
 	try {
-		const requestData: ProcessedData = await request.json();
+		const requestData: MatchesResults = await request.json();
 
 		const championshipResults = calculateChampionshipResults(requestData);
 
@@ -22,7 +22,7 @@ export async function handleCreateChampionshipResults(request: Request): Promise
 	}
 }
 
-function calculateChampionshipResults(data: ProcessedData): ChampionshipResult[] {
+function calculateChampionshipResults(data: MatchesResults): ChampionshipResult[] {
 	const { scores, competitors, matches, registrations } = data;
 
 	const validScores = scores.filter((score) => {

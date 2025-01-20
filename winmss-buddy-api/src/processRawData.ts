@@ -1,4 +1,4 @@
-import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge, ProcessedData } from "./models";
+import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge, MatchesResults } from "./models";
 
 export async function handleProcessRawData(request: Request): Promise<Response> {
 	try {
@@ -94,7 +94,7 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 		const competitorMerges = createCompetitorMerges(combinedData.competitors);
 		combinedData.competitorMerges = competitorMerges;
 
-		const processedData: ProcessedData = {
+		const processedData: MatchesResults = {
 			matches: combinedData.matches,
 			stages: combinedData.stages,
 			competitors: combinedData.competitors,
