@@ -1,9 +1,10 @@
 import React from "react";
 import { Table } from "antd";
-import {Score, Stage} from "../../../../winmss-buddy-api/src/models.ts";
+import { Score, Stage } from "../../../../winmss-buddy-api/src/models.ts";
+import { StageModel } from "../../models"; // Import StageModel
 
 const StagesTab: React.FC<any> = ({ match, stages, scores }) => {
-    const dataSource = stages
+    const dataSource: StageModel[] = stages
         .filter((stage: Stage) => stage.matchId === match.matchId)
         .map((stage: Stage) => {
             const scoreCount = scores.filter(
@@ -11,6 +12,7 @@ const StagesTab: React.FC<any> = ({ match, stages, scores }) => {
             ).length;
 
             return {
+                key: stage.stageId,
                 stageNumber: stage.stageId,
                 stageName: stage.stageName,
                 scoreCount,
@@ -18,31 +20,32 @@ const StagesTab: React.FC<any> = ({ match, stages, scores }) => {
         });
 
     return (
-        <Table
+        <Table<StageModel>
             dataSource={dataSource}
-    columns={[
-            {
-                title: "Stage No",
-                dataIndex: "stageNumber",
-                key: "stageNumber",
-                sorter: (a, b) => a.stageNumber - b.stageNumber,
-            },
-    {
-        title: "Stage Name",
-            dataIndex: "stageName",
-        key: "stageName",
-        sorter: (a, b) => a.stageName.localeCompare(b.stageName),
-    },
-    {
-        title: "No of Scores",
-            dataIndex: "scoreCount",
-        key: "scoreCount",
-        sorter: (a, b) => a.scoreCount - b.scoreCount,
-    },
-]}
-    bordered
-    />
-);
+            rowKey="key" // Use the unique key field
+            columns={[
+                {
+                    title: "Stage No",
+                    dataIndex: "stageNumber",
+                    key: "stageNumber",
+                    sorter: (a, b) => a.stageNumber - b.stageNumber,
+                },
+                {
+                    title: "Stage Name",
+                    dataIndex: "stageName",
+                    key: "stageName",
+                    sorter: (a, b) => a.stageName.localeCompare(b.stageName),
+                },
+                {
+                    title: "No of Scores",
+                    dataIndex: "scoreCount",
+                    key: "scoreCount",
+                    sorter: (a, b) => a.scoreCount - b.scoreCount,
+                },
+            ]}
+            bordered
+        />
+    );
 };
 
 export default StagesTab;

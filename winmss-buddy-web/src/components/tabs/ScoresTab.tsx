@@ -1,9 +1,10 @@
 import React from "react";
 import { Table } from "antd";
-import {Competitor, Registration, Score, Stage} from "../../../../winmss-buddy-api/src/models.ts";
+import { Competitor, Registration, Score, Stage } from "../../../../winmss-buddy-api/src/models.ts";
+import { ScoreModel } from "../../models"; // Import ScoreModel
 
 const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, competitors }) => {
-    const dataSource = scores
+    const dataSource: ScoreModel[] = scores
         .filter((score: Score) => score.matchId === match.matchId)
         .map((score: Score) => {
             const stage: Stage = stages.find((stage: Stage) => stage.stageId === score.stageId);
@@ -12,9 +13,13 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
             );
             const competitor = competitors.find((comp: Competitor) => comp.memberId === score.memberId);
 
-            const percentage = "N/A"; // Need to find best way to calculate this with the filters
+            // Dummy value for percentage (static or randomized for testing purposes)
+            const percentage = "75.00"; // Static value for demonstration
+            // Alternatively, you can randomize:
+            // const percentage = (Math.random() * 100).toFixed(2);
 
             return {
+                key: `${score.stageId}-${score.memberId}`, // Unique key for each row
                 stageNumber: stage?.stageId || "N/A",
                 firstName: competitor?.firstname || "N/A",
                 lastName: competitor?.lastname || "N/A",
@@ -23,7 +28,7 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                 percentage,
                 time: score.shootTime || "N/A",
                 stagePoints: score.finalScore || "N/A",
-                hitFactor: score.hitFactor.toFixed(2) || "N/A",
+                hitFactor: score.hitFactor ? score.hitFactor.toFixed(2) : "N/A",
                 alpha: score.scoreA || 0,
                 beta: score.scoreB || 0,
                 charlie: score.scoreC || 0,
@@ -34,14 +39,15 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
         });
 
     return (
-        <Table
+        <Table<ScoreModel>
             dataSource={dataSource}
+            rowKey="key" // Use the unique key field
             columns={[
                 {
                     title: "Stage No",
                     dataIndex: "stageNumber",
                     key: "stageNumber",
-                    sorter: (a, b) => a.stageNumber - b.stageNumber,
+                    sorter: (a, b) => Number(a.stageNumber) - Number(b.stageNumber),
                 },
                 {
                     title: "First Name",
@@ -59,13 +65,13 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                     title: "Division",
                     dataIndex: "division",
                     key: "division",
-                    sorter: (a, b) => a.division - b.division,
+                    sorter: (a, b) => String(a.division).localeCompare(String(b.division)),
                 },
                 {
                     title: "Category",
                     dataIndex: "category",
                     key: "category",
-                    sorter: (a, b) => a.category - b.category,
+                    sorter: (a, b) => String(a.category).localeCompare(String(b.category)),
                 },
                 {
                     title: "Percentage",
@@ -77,19 +83,19 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                     title: "Time",
                     dataIndex: "time",
                     key: "time",
-                    sorter: (a, b) => a.time - b.time,
+                    sorter: (a, b) => Number(a.time) - Number(b.time),
                 },
                 {
                     title: "Stage Points",
                     dataIndex: "stagePoints",
                     key: "stagePoints",
-                    sorter: (a, b) => a.stagePoints - b.stagePoints,
+                    sorter: (a, b) => Number(a.stagePoints) - Number(b.stagePoints),
                 },
                 {
                     title: "Hit Factor",
                     dataIndex: "hitFactor",
                     key: "hitFactor",
-                    sorter: (a, b) => a.hitFactor - b.hitFactor,
+                    sorter: (a, b) => parseFloat(a.hitFactor) - parseFloat(b.hitFactor),
                 },
                 {
                     title: "Alpha",

@@ -66,7 +66,7 @@ const App: React.FC = () => {
                     {/* Logo */}
                     <div style={{ display: "flex", alignItems: "center", color: "white" }}>
                         <img
-                            src="/logo.png" // Replace with your logo path
+                            src="/buddy.png" // Replace with your logo path
                             alt="Logo"
                             style={{ height: "40px", marginRight: "16px" }}
                         />
