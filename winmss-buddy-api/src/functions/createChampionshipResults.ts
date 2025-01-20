@@ -1,4 +1,9 @@
-import { MatchesResults, ChampionshipResultsResponse, ChampionshipResult, MatchResult, Score } from "./models";
+import {MatchesResults} from "../models/MatchesResults";
+import {ChampionshipResultsResponse} from "../models/ChampionshipResultsResponse";
+import {ChampionshipResult} from "../models/ChampionshipResult";
+import {Score} from "../models/Score";
+import {MatchResult} from "../models/MatchResult";
+
 
 export async function handleCreateChampionshipResults(request: Request): Promise<Response> {
 	try {

@@ -1,4 +1,6 @@
-import { MatchesResults, CompetitorMerge } from "./models";
+import {MatchesResults} from "../models/MatchesResults";
+import {CompetitorMerge} from "../models/CompetitorMerge";
+
 
 export async function handleMergeCompetitorsData(request: Request): Promise<Response> {
 	try {
@@ -7,7 +9,7 @@ export async function handleMergeCompetitorsData(request: Request): Promise<Resp
 		// Create a map of all mergeMemberIds pointing to their associated memberId
 		const mergeMap: Record<number, number> = {};
 		requestData.competitorMerges.forEach((merge) => {
-			merge.mergeMemberIds.forEach((mergeId) => {
+			merge.mergeMemberIds.forEach((mergeId: number) => {
 				mergeMap[mergeId] = merge.memberId;
 			});
 		});

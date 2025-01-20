@@ -1,5 +1,3 @@
-// views/InfoView.tsx
-
 import React from "react";
 import { InfoController } from '../controllers/InfoController';
 import { AppInfoModel } from '../models'; // Import the AppInfoModel

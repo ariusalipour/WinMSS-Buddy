@@ -1,7 +1,7 @@
-import { handleProcessRawData } from "./processRawData";
-import { handleMergeCompetitorsData } from "./mergeCompetitorsData";
-import { handleCreateChampionshipResults } from "./createChampionshipResults";
-import { handleRoot } from "./root";
+import { handleProcessRawData } from "./functions/processRawData";
+import { handleMergeCompetitorsData } from "./functions/mergeCompetitorsData";
+import { handleCreateChampionshipResults } from "./functions/createChampionshipResults";
+import { handleRoot } from "./functions/root";
 
 const addCORSHeaders = (response: Response): Response => {
 	const headers = new Headers(response.headers);

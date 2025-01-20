@@ -1,7 +1,9 @@
 import React from "react";
 import { Table } from "antd";
-import { Competitor, Registration, Squad } from "../../../../winmss-buddy-api/src/models.ts";
-import { CompetitorModel } from "../../models"; // Import CompetitorModel
+import { Registration } from "../../../../winmss-buddy-api/src/models/Registration";
+import { CompetitorModel } from "../../models";
+import {Competitor} from "../../../../winmss-buddy-api/src/models/Competitor.ts";
+import {Squad} from "../../../../winmss-buddy-api/src/models/Squad.ts"; // Import CompetitorModel
 
 const CompetitorsTab: React.FC<any> = ({ match, registrations, competitors, squads }) => {
     const dataSource: CompetitorModel[] = registrations

@@ -1,5 +1,3 @@
-// controllers/InfoController.ts
-
 import { AppInfoModel } from '../models'; // Import the AppInfoModel
 
 export class InfoController {

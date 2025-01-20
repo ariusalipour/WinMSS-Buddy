@@ -1,4 +1,12 @@
-import { Competitor, Match, Registration, Squad, Score, Stage, CompetitorMerge, MatchesResults } from "./models";
+import {Match} from "../models/Match";
+import {Stage} from "../models/Stage";
+import {Competitor} from "../models/Competitor";
+import {Squad} from "../models/Squad";
+import {Registration} from "../models/Registration";
+import {Score} from "../models/Score";
+import {CompetitorMerge} from "../models/CompetitorMerge";
+import {MatchesResults} from "../models/MatchesResults";
+
 
 export async function handleProcessRawData(request: Request): Promise<Response> {
 	try {

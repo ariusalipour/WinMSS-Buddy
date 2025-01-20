@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
-import { MatchesResults, ChampionshipResult } from "../../../winmss-buddy-api/src/models.ts";
+import { MatchesResults } from "../../../winmss-buddy-api/src/models/MatchesResults";
+import {ChampionshipResult} from "../../../winmss-buddy-api/src/models/ChampionshipResult.ts";
 
 interface AppContextProps {
     processedData: MatchesResults | null;

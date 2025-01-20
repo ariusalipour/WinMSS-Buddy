@@ -1,5 +1,5 @@
 import axios from "axios";
-import { MatchesResults } from "../../../winmss-buddy-api/src/models.ts";
+import { MatchesResults } from "../../../winmss-buddy-api/src/models/MatchesResults";
 
 const API_BASE_URL = "https://winmss-buddy-api.chambercheck.app"; // Update to your API base URL
 

@@ -1,7 +1,8 @@
 import React from "react";
 import { Table } from "antd";
-import { Score, Stage } from "../../../../winmss-buddy-api/src/models.ts";
-import { StageModel } from "../../models"; // Import StageModel
+import { Score } from "../../../../winmss-buddy-api/src/models/score";
+import { StageModel } from "../../models";
+import {Stage} from "../../../../winmss-buddy-api/src/models/Stage.ts"; // Import StageModel
 
 const StagesTab: React.FC<any> = ({ match, stages, scores }) => {
     const dataSource: StageModel[] = stages
