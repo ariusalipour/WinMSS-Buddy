@@ -1,4 +1,11 @@
-import {Competitor, CompetitorMerge, Match, Registration, Score, Squad, Stage} from "../models";
+import {Match} from "./Match";
+import {Stage} from "./Stage";
+import {Competitor} from "./Competitor";
+import {Squad} from "./Squad";
+import {Registration} from "./Registration";
+import {Score} from "./Score";
+import {CompetitorMerge} from "./CompetitorMerge";
+
 
 export interface MatchesResults {
 	matches: Match[];

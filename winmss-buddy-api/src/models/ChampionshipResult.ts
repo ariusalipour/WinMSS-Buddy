@@ -1,4 +1,4 @@
-import {MatchResult} from "../models";
+import {MatchResult} from "./MatchResult";
 
 export interface ChampionshipResult {
 	memberId: number;
