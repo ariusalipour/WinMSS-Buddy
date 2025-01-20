@@ -5,6 +5,7 @@ export interface SquadModel {
 }
 
 export interface ScoreModel {
+    position: number;
     stageNumber: string | number;
     firstName: string;
     lastName: string;
