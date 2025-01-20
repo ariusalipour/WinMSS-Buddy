@@ -1,3 +1,8 @@
+export interface MatchModel {
+    matchId: number;
+    matchName: string;
+}
+
 export interface AppInfoModel {
     developerName: string;
     emailAddress: string;
