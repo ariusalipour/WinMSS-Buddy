@@ -34,10 +34,7 @@ const MatchesView: React.FC = () => {
                         <TabPane tab={match.matchName} key={`match-${matchIndex}`}>
                             <Tabs defaultActiveKey="1">
                                 {/* Competitors Tab */}
-                                <TabPane
-                                    tab={`Competitors (${competitorCount})`}
-                                    key="1"
-                                >
+                                <TabPane tab={`Competitors (${competitorCount})`} key="1">
                                     <Table
                                         dataSource={processedData.registrations
                                             .filter((reg) => reg.matchId === match.matchId)
@@ -154,21 +151,30 @@ const MatchesView: React.FC = () => {
                                 {/* Squads Tab */}
                                 <TabPane tab={`Squads (${squadCount})`} key="3">
                                     <Table
-                                        dataSource={processedData.squads.filter(
-                                            (squad) => squad.matchId === match.matchId
-                                        )}
+                                        dataSource={processedData.squads
+                                            .filter((squad) => squad.matchId === match.matchId)
+                                            .map((squad) => {
+                                                const registrationCount = processedData.registrations.filter(
+                                                    (reg) => reg.squadId === squad.squadId
+                                                ).length;
+
+                                                return {
+                                                    squadName: squad.squadName,
+                                                    noInSquad: registrationCount,
+                                                };
+                                            })}
                                         columns={[
                                             {
-                                                title: "Squad Name",
+                                                title: "Squad Name/No",
                                                 dataIndex: "squadName",
                                                 key: "squadName",
                                                 sorter: (a, b) => a.squadName.localeCompare(b.squadName),
                                             },
                                             {
-                                                title: "Squad Number",
-                                                dataIndex: "squadNumber",
-                                                key: "squadNumber",
-                                                sorter: (a, b) => a.squadNumber - b.squadNumber,
+                                                title: "No in Squad",
+                                                dataIndex: "noInSquad",
+                                                key: "noInSquad",
+                                                sorter: (a, b) => a.noInSquad - b.noInSquad,
                                             },
                                         ]}
                                         bordered
