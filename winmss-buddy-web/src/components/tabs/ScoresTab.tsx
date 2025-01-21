@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Table, Select } from "antd";
 import { Competitor } from "../../../../winmss-buddy-api/src/models/Competitor";
-import { ScoreModel } from "../../models";
 import {Registration} from "../../../../winmss-buddy-api/src/models/Registration.ts";
 import {Score} from "../../../../winmss-buddy-api/src/models/Score.ts";
-import {Stage} from "../../../../winmss-buddy-api/src/models/Stage.ts"; // Import ScoreModel
+import {Stage} from "../../../../winmss-buddy-api/src/models/Stage.ts";
+import {ScoreModel} from "../../models/ScoreModel.ts"; // Import ScoreModel
 
 const { Option } = Select;
 

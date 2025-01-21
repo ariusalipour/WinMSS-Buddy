@@ -1,8 +1,8 @@
 import React from "react";
 import { InfoController } from '../controllers/InfoController';
-import { AppInfoModel } from '../models'; // Import the AppInfoModel
 import { FacebookOutlined, InstagramOutlined, YoutubeOutlined } from '@ant-design/icons'; // Import icons
-import './InfoView.css'; // Import a CSS file for styling
+import './InfoView.css';
+import {AppInfoModel} from "../models/AppInfoModel.ts"; // Import a CSS file for styling
 
 const infoController = new InfoController();
 

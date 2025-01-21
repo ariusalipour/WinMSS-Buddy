@@ -1,4 +1,4 @@
-import { AppInfoModel } from '../models'; // Import the AppInfoModel
+import {AppInfoModel} from "../models/AppInfoModel.ts";
 
 export class InfoController {
     getAppInfo(): AppInfoModel {

@@ -1,8 +1,8 @@
 import React from "react";
 import { Table } from "antd";
 import { Registration } from "../../../../winmss-buddy-api/src/models/Registration";
-import { SquadModel } from "../../models.ts";
 import {Squad} from "../../../../winmss-buddy-api/src/models/Squad.ts";
+import {SquadModel} from "../../models/SquadModel.ts";
 
 const SquadsTab: React.FC<any> = ({ match, squads, registrations }) => {
     const dataSource = squads

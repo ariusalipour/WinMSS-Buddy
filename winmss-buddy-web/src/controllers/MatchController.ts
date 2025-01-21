@@ -1,5 +1,5 @@
-import { MatchModel } from '../models';
 import { useAppContext } from '../context/AppContext';
+import {MatchModel} from "../models/MatchModel.ts";
 
 export class MatchController {
     private context = useAppContext();
