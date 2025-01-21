@@ -1,35 +1,17 @@
+// winmss-buddy-web/src/views/CompetitorsTab.ts
+
 import React from "react";
 import { Table } from "antd";
-import { Registration } from "../../../../winmss-buddy-api/src/models/Registration";
-import {Competitor} from "../../../../winmss-buddy-api/src/models/Competitor.ts";
-import {Squad} from "../../../../winmss-buddy-api/src/models/Squad.ts";
-import {CompetitorModel} from "../../models/CompetitorModel.ts"; // Import CompetitorModel
+import { CompetitorModel } from "../../models/CompetitorModel";
+import { CompetitorController } from "../../controllers/CompetitorController";
 
-const CompetitorsTab: React.FC<any> = ({ match, registrations, competitors, squads }) => {
-    const dataSource: CompetitorModel[] = registrations
-        .filter((reg: Registration) => reg.matchId === match.matchId)
-        .map((reg: Registration) => {
-            const competitor = competitors.find((comp: Competitor) => comp.memberId === reg.memberId);
-            const squad = squads.find((squad: Squad) => squad.squadId === reg.squadId);
-
-            return competitor
-                ? {
-                    key: `${reg.matchId}-${reg.memberId}`, // Ensure unique key
-                    firstName: competitor.firstname,
-                    lastName: competitor.lastname,
-                    division: reg.divisionId,
-                    category: reg.categoryId,
-                    region: competitor.regionId,
-                    class: competitor.classId,
-                    squadName: squad?.squadName || "N/A",
-                }
-                : null;
-        })
-        .filter((item: CompetitorModel): item is CompetitorModel => item !== null);
+const CompetitorsTab: React.FC = () => {
+    // Fetch competitor data via CompetitorController
+    const competitors = CompetitorController.getCompetitors();
 
     return (
         <Table<CompetitorModel>
-            dataSource={dataSource}
+            dataSource={competitors}
             rowKey="key" // Use the unique key field
             columns={[
                 {
