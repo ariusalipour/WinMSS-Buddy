@@ -69,7 +69,7 @@ export class MatchesController {
             .filter(stage => stage.matchId === matchId)
             .map(stage => {
                 const noOfScores = this.scores.filter(
-                    score => score.stageId === stage.stageId
+                    score => score.stageId === stage.stageId && score.matchId === matchId
                 ).length;
                 return { ...stage, noOfScores };
             });
