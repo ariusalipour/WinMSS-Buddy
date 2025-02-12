@@ -3,12 +3,12 @@ export interface ScoreModel {
     stageNumber: number;
     firstName: string;
     lastName: string;
-    division: string;
     category: string;
     percentage: string;
+    points: number;
     time: number;
-    stagePoints: number;
-    hitFactor: string;
+    division: string;
+    hitFactor: number;
     alpha: number;
     beta: number;
     charlie: number;

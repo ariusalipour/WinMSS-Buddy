@@ -1,7 +1,5 @@
-// winmss-buddy-web/src/models/CompetitorModel.ts
-
 export interface CompetitorModel {
-    key: string; // Unique identifier for table rows
+    competitorId: number;
     firstName: string;
     lastName: string;
     division: number;

@@ -1,72 +1,51 @@
+// src/views/MatchesView.tsx
 import React from "react";
 import { Tabs } from "antd";
-import { useAppContext } from "../context/AppContext";
-import CompetitorsTab from "../components/tabs/CompetitorsTab.tsx";
-import StagesTab from "../components/tabs/StagesTab.tsx";
-import SquadsTab from "../components/tabs/SquadsTab.tsx";
+import CompetitorsTab from "../components/tabs/CompetitorsTab";
+import StagesTab from "../components/tabs/StagesTab";
+import SquadsTab from "../components/tabs/SquadsTab";
 import ScoresTab from "../components/tabs/ScoresTab";
+import { useMatchesController } from "../hooks/useMatchesController";
 
 const { TabPane } = Tabs;
 
 const MatchesView: React.FC = () => {
-    const { processedData } = useAppContext();
+    // Get the controller from our custom hook.
+    const matchesController = useMatchesController();
 
-    if (!processedData?.matches || processedData.matches.length === 0) {
-        return <p>No matches to display. Upload data to view matches.</p>;
+    // If no processed data is available, prompt the user to upload.
+    if (!matchesController) {
+        return <p>No matches to display. Please upload data to view matches.</p>;
     }
+
+    // Retrieve the match view models.
+    const matchModels = matchesController.getMatches();
 
     return (
         <div>
             <h2>Matches</h2>
             <Tabs>
-                {processedData.matches.map((match, matchIndex) => {
-                    // Count related data for the current match
-                    const competitorCount = processedData.registrations.filter(
-                        (reg) => reg.matchId === match.matchId
-                    ).length;
-                    const stageCount = processedData.stages.filter(
-                        (stage) => stage.matchId === match.matchId
-                    ).length;
-                    const squadCount = processedData.squads.filter(
-                        (squad) => squad.matchId === match.matchId
-                    ).length;
-                    const scoreCount = processedData.scores.filter(
-                        (score) => score.matchId === match.matchId
-                    ).length;
+                {matchModels.map((match, matchIndex) => {
+                    // For each match, get the processed view models from the controller.
+                    const competitorModels = matchesController.getCompetitors(match.matchId);
+                    const stageModels = matchesController.getStages(match.matchId);
+                    const squadModels = matchesController.getSquads(match.matchId);
+                    const scoreModels = matchesController.getScores(match.matchId);
 
                     return (
                         <TabPane tab={match.matchName} key={`match-${matchIndex}`}>
                             <Tabs defaultActiveKey="1">
-                                <TabPane tab={`Competitors (${competitorCount})`} key="1">
-                                    <CompetitorsTab
-                                        match={match}
-                                        registrations={processedData.registrations}
-                                        competitors={processedData.competitors}
-                                        squads={processedData.squads}
-                                    />
+                                <TabPane tab={`Competitors (${competitorModels.length})`} key="1">
+                                    <CompetitorsTab competitorModels={competitorModels} />
                                 </TabPane>
-                                <TabPane tab={`Stages (${stageCount})`} key="2">
-                                    <StagesTab
-                                        match={match}
-                                        stages={processedData.stages}
-                                        scores={processedData.scores}
-                                    />
+                                <TabPane tab={`Stages (${stageModels.length})`} key="2">
+                                    <StagesTab stageModels={stageModels} />
                                 </TabPane>
-                                <TabPane tab={`Squads (${squadCount})`} key="3">
-                                    <SquadsTab
-                                        match={match}
-                                        squads={processedData.squads}
-                                        registrations={processedData.registrations}
-                                    />
+                                <TabPane tab={`Squads (${squadModels.length})`} key="3">
+                                    <SquadsTab squadModels={squadModels} />
                                 </TabPane>
-                                <TabPane tab={`Scores (${scoreCount})`} key="4">
-                                    <ScoresTab
-                                        match={match}
-                                        scores={processedData.scores}
-                                        stages={processedData.stages}
-                                        registrations={processedData.registrations}
-                                        competitors={processedData.competitors}
-                                    />
+                                <TabPane tab={`Scores (${scoreModels.length})`} key="4">
+                                    <ScoresTab match={match} matchesController={matchesController} />
                                 </TabPane>
                             </Tabs>
                         </TabPane>

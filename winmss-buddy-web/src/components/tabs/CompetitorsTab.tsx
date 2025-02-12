@@ -1,18 +1,17 @@
-// winmss-buddy-web/src/views/CompetitorsTab.ts
-
+// CompetitorsTab.tsx
 import React from "react";
 import { Table } from "antd";
 import { CompetitorModel } from "../../models/CompetitorModel";
-import { CompetitorController } from "../../controllers/CompetitorController";
 
-const CompetitorsTab: React.FC = () => {
-    // Fetch competitor data via CompetitorController
-    const competitors = CompetitorController.getCompetitors();
+interface CompetitorsTabProps {
+    competitorModels: CompetitorModel[];
+}
 
+const CompetitorsTab: React.FC<CompetitorsTabProps> = ({ competitorModels }) => {
     return (
         <Table<CompetitorModel>
-            dataSource={competitors}
-            rowKey="key" // Use the unique key field
+            dataSource={competitorModels}
+            rowKey="competitorId" // Use a unique identifier from your view model
             columns={[
                 {
                     title: "First Name",
@@ -42,13 +41,13 @@ const CompetitorsTab: React.FC = () => {
                     title: "Region",
                     dataIndex: "region",
                     key: "region",
-                    sorter: (a, b) => a.region - b.region,
+                    sorter: (a, b) => a.region.localeCompare(b.region),
                 },
                 {
                     title: "Class",
                     dataIndex: "class",
                     key: "class",
-                    sorter: (a, b) => a.class - b.class,
+                    sorter: (a, b) => a.class.localeCompare(b.class),
                 },
                 {
                     title: "Squad",

@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+// ScoresTab.tsx
+import React, { useState, useMemo } from "react";
 import { Table, Select } from "antd";
-import { Competitor } from "../../../../winmss-buddy-api/src/models/Competitor";
-import {Registration} from "../../../../winmss-buddy-api/src/models/Registration.ts";
-import {Score} from "../../../../winmss-buddy-api/src/models/Score.ts";
-import {Stage} from "../../../../winmss-buddy-api/src/models/Stage.ts";
-import {ScoreModel} from "../../models/ScoreModel.ts"; // Import ScoreModel
+import { ScoreModel } from "../../models/ScoreModel";
+import { MatchesController } from "../../controllers/MatchesController";
 
 const { Option } = Select;
 
-const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, competitors }) => {
+interface ScoresTabProps {
+    match: any;
+    matchesController: MatchesController;
+}
+
+const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
     const [selectedStageId, setSelectedStageId] = useState<number | "overall">("overall");
     const [selectedDivision, setSelectedDivision] = useState<string | "all">("all");
     const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
@@ -18,80 +21,35 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
     };
 
     const handleDivisionChange = (value: string) => {
-        setSelectedDivision(value === "all" ? "all" : value);
+        setSelectedDivision(value);
     };
 
     const handleCategoryChange = (value: string) => {
-        setSelectedCategory(value === "all" ? "all" : value);
+        setSelectedCategory(value);
     };
 
-    // Filter scores based on selected stage, division, and category
-    const filteredScores = scores
-        .filter((score: Score) => score.matchId === match.matchId)
-        .filter((score: Score) =>
-            selectedStageId === "overall" || score.stageId === selectedStageId
-        )
-        .filter((score: Score) => {
-            const registration = registrations.find(
-                (reg: Registration) =>
-                    reg.memberId === score.memberId && reg.matchId === score.matchId
-            );
-            return (
-                (selectedDivision === "all" || String(registration?.divisionId) === selectedDivision) &&
-                (selectedCategory === "all" || String(registration?.categoryId) === selectedCategory)
-            );
-        });
+    // Get unique divisions and categories (assume these helper methods are added to MatchesController)
+    const uniqueDivisions = matchesController.getUniqueDivisions(match.matchId);
+    const uniqueCategories = matchesController.getUniqueCategories(match.matchId);
 
-    // Get the highest hit factor for the selected stage
-    const highestHitFactor =
-        selectedStageId === "overall"
-            ? 0
-            : Math.max(...filteredScores.map((score: Score) => score.hitFactor || 0), 0);
+    // Retrieve stage models for the stage dropdown
+    const stageModels = matchesController.getStages(match.matchId);
 
-    // Generate the data source with Position and Percentage
-    const dataSource: ScoreModel[] = filteredScores
-        .map((score: Score) => {
-            const stage: Stage = stages.find((stage: Stage) => stage.stageId === score.stageId);
-            const registration: Registration = registrations.find(
-                (reg: Registration) => reg.memberId === score.memberId && reg.matchId === score.matchId
-            );
-            const competitor = competitors.find((comp: Competitor) => comp.memberId === score.memberId);
-
-            const percentage =
-                highestHitFactor === 0
-                    ? "N/A"
-                    : ((score.hitFactor || 0) / highestHitFactor * 100).toFixed(2);
-
-            return {
-                key: `${score.stageId}-${score.memberId}`,
-                stageNumber: stage?.stageId || "Overall",
-                position: 0,
-                percentage,
-                firstName: competitor?.firstname || "N/A",
-                lastName: competitor?.lastname || "N/A",
-                division: registration?.divisionId || "N/A",
-                category: registration?.categoryId || "N/A",
-                time: score.shootTime || "N/A",
-                stagePoints: score.finalScore || "N/A",
-                hitFactor: score.hitFactor ? score.hitFactor.toFixed(2) : "N/A",
-                alpha: score.scoreA || 0,
-                beta: score.scoreB || 0,
-                charlie: score.scoreC || 0,
-                delta: score.scoreD || 0,
-                mike: score.misses || 0,
-                penalty: score.penalties || 0,
-            };
-        })
-        .sort((a: ScoreModel, b: ScoreModel) => parseFloat(b.percentage) - parseFloat(a.percentage))
-        .map((item: ScoreModel, index: number) => ({ ...item, position: index + 1 }));
-
-    const uniqueDivisions = [
-        ...new Set(registrations.map((reg: Registration) => String(reg.divisionId))),
-    ];
-
-    const uniqueCategories = [
-        ...new Set(registrations.map((reg: Registration) => String(reg.categoryId))),
-    ];
+    // Re-calculate the filtered scores every time a filter changes
+    const scoreModels: ScoreModel[] = useMemo(() => {
+        return matchesController.getScores(
+            match.matchId,
+            selectedStageId === "overall" ? undefined : selectedStageId,
+            selectedDivision === "all" ? undefined : Number(selectedDivision),
+            selectedCategory === "all" ? undefined : Number(selectedCategory)
+        );
+    }, [
+        match.matchId,
+        selectedStageId,
+        selectedDivision,
+        selectedCategory,
+        matchesController,
+    ]);
 
     return (
         <div>
@@ -104,13 +62,11 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                     <Option key="overall" value="overall">
                         Overall Results
                     </Option>
-                    {stages
-                        .filter((stage: Stage) => stage.matchId === match.matchId)
-                        .map((stage: Stage) => (
-                            <Option key={String(stage.stageId)} value={String(stage.stageId)}>
-                                {stage.stageName}
-                            </Option>
-                        ))}
+                    {stageModels.map((stage) => (
+                        <Option key={String(stage.stageNumber)} value={String(stage.stageNumber)}>
+                            {stage.stageName}
+                        </Option>
+                    ))}
                 </Select>
 
                 <Select
@@ -122,8 +78,8 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                         All Divisions
                     </Option>
                     {uniqueDivisions.map((division) => (
-                        <Option key={String(division)} value={String(division)}>
-                            {String(division)}
+                        <Option key={division} value={division}>
+                            {division}
                         </Option>
                     ))}
                 </Select>
@@ -137,112 +93,116 @@ const ScoresTab: React.FC<any> = ({ match, scores, stages, registrations, compet
                         All Categories
                     </Option>
                     {uniqueCategories.map((category) => (
-                        <Option key={String(category)} value={String(category)}>
-                            {String(category)}
+                        <Option key={category} value={category}>
+                            {category}
                         </Option>
                     ))}
                 </Select>
             </div>
 
             <Table<ScoreModel>
-                dataSource={dataSource}
-                rowKey="key"
+                dataSource={scoreModels}
+                rowKey="position" // Ensure this is unique per score model (or use a dedicated key field)
                 columns={[
                     {
                         title: "Position",
                         dataIndex: "position",
                         key: "position",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.position - b.position,
+                        sorter: (a, b) => a.position - b.position,
                     },
                     {
                         title: "Percentage",
                         dataIndex: "percentage",
                         key: "percentage",
-                        sorter: (a: ScoreModel, b: ScoreModel) => parseFloat(a.percentage) - parseFloat(b.percentage),
+                        sorter: (a, b) =>
+                            parseFloat(a.percentage) - parseFloat(b.percentage),
                     },
                     {
                         title: "Stage No",
                         dataIndex: "stageNumber",
                         key: "stageNumber",
-                        sorter: (a: ScoreModel, b: ScoreModel) => Number(a.stageNumber) - Number(b.stageNumber),
+                        sorter: (a, b) =>
+                            Number(a.stageNumber) - Number(b.stageNumber),
                     },
                     {
                         title: "First Name",
                         dataIndex: "firstName",
                         key: "firstName",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.firstName.localeCompare(b.firstName),
+                        sorter: (a, b) => a.firstName.localeCompare(b.firstName),
                     },
                     {
                         title: "Last Name",
                         dataIndex: "lastName",
                         key: "lastName",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.lastName.localeCompare(b.lastName),
+                        sorter: (a, b) => a.lastName.localeCompare(b.lastName),
                     },
                     {
                         title: "Division",
                         dataIndex: "division",
                         key: "division",
-                        sorter: (a: ScoreModel, b: ScoreModel) => String(a.division).localeCompare(String(b.division)),
+                        sorter: (a, b) =>
+                            String(a.division).localeCompare(String(b.division)),
                     },
                     {
                         title: "Category",
                         dataIndex: "category",
                         key: "category",
-                        sorter: (a: ScoreModel, b: ScoreModel) => String(a.category).localeCompare(String(b.category)),
+                        sorter: (a, b) =>
+                            String(a.category).localeCompare(String(b.category)),
                     },
                     {
                         title: "Time",
                         dataIndex: "time",
                         key: "time",
-                        sorter: (a: ScoreModel, b: ScoreModel) => Number(a.time) - Number(b.time),
+                        sorter: (a, b) => Number(a.time) - Number(b.time),
                     },
                     {
                         title: "Stage Points",
-                        dataIndex: "stagePoints",
-                        key: "stagePoints",
-                        sorter: (a: ScoreModel, b: ScoreModel) => Number(a.stagePoints) - Number(b.stagePoints),
+                        dataIndex: "points",
+                        key: "points",
+                        sorter: (a, b) => Number(a.points) - Number(b.points),
                     },
                     {
                         title: "Hit Factor",
                         dataIndex: "hitFactor",
                         key: "hitFactor",
-                        sorter: (a: ScoreModel, b: ScoreModel) => parseFloat(a.hitFactor) - parseFloat(b.hitFactor),
+                        sorter: (a, b) => Number(a.hitFactor) - Number(b.hitFactor),
                     },
                     {
                         title: "Alpha",
                         dataIndex: "alpha",
                         key: "alpha",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.alpha - b.alpha,
+                        sorter: (a, b) => a.alpha - b.alpha,
                     },
                     {
                         title: "Beta",
                         dataIndex: "beta",
                         key: "beta",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.beta - b.beta,
+                        sorter: (a, b) => a.beta - b.beta,
                     },
                     {
                         title: "Charlie",
                         dataIndex: "charlie",
                         key: "charlie",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.charlie - b.charlie,
+                        sorter: (a, b) => a.charlie - b.charlie,
                     },
                     {
                         title: "Delta",
                         dataIndex: "delta",
                         key: "delta",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.delta - b.delta,
+                        sorter: (a, b) => a.delta - b.delta,
                     },
                     {
                         title: "Mike",
                         dataIndex: "mike",
                         key: "mike",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.mike - b.mike,
+                        sorter: (a, b) => a.mike - b.mike,
                     },
                     {
                         title: "Penalty",
                         dataIndex: "penalty",
                         key: "penalty",
-                        sorter: (a: ScoreModel, b: ScoreModel) => a.penalty - b.penalty,
+                        sorter: (a, b) => a.penalty - b.penalty,
                     },
                 ]}
                 bordered

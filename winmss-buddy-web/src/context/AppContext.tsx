@@ -4,20 +4,20 @@ import React, { createContext, useState, useContext } from "react";
 import { MatchesResults } from "../../../winmss-buddy-api/src/models/MatchesResults";
 
 interface AppContextProps {
-    processedData: MatchesResults | null;
-    setProcessedData: (data: MatchesResults) => void;
+    apiResponse: MatchesResults | null;
+    setApiResponse: (data: MatchesResults) => void;
 }
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [processedData, setProcessedData] = useState<MatchesResults | null>(null);
+    const [apiResponse, setApiResponse] = useState<MatchesResults | null>(null);
 
     return (
         <AppContext.Provider
             value={{
-                processedData,
-                setProcessedData,
+                apiResponse,
+                setApiResponse,
             }}
         >
             {children}
