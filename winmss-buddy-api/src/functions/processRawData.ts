@@ -239,6 +239,7 @@ function processFile(rawContent: string) {
 	).map((attributes) => ({
 		stageId: parseInt(attributes.StageId, 10),
 		matchId: parseInt(attributes.MatchId, 10),
+		maxPoints: parseInt(attributes.MaxPoints, 10),
 		stageName: attributes.StageName,
 		uniqueStageId: 0, // Temporary placeholder, will be set later
 	}));
