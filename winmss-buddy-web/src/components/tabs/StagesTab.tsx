@@ -26,6 +26,12 @@ const StagesTab: React.FC<StagesTabProps> = ({ stageModels }) => {
                     sorter: (a, b) => a.stageName.localeCompare(b.stageName),
                 },
                 {
+                    title: "Max Points",
+                    dataIndex: "maxPoints",
+                    key: "maxPoints",
+                    sorter: (a, b) => a.maxPoints - b.maxPoints,
+                },
+                {
                     title: "No of Scores",
                     dataIndex: "scoreCount",
                     key: "scoreCount",

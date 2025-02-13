@@ -158,15 +158,21 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                     },
                     {
                         title: "Stage Points",
-                        dataIndex: "points",
-                        key: "points",
-                        sorter: (a, b) => Number(a.points) - Number(b.points),
+                        dataIndex: "stagePoints",
+                        key: "stagePoints",
+                        sorter: (a, b) => Number(a.stagePoints) - Number(b.stagePoints),
                     },
                     {
                         title: "Hit Factor",
                         dataIndex: "hitFactor",
                         key: "hitFactor",
                         sorter: (a, b) => Number(a.hitFactor) - Number(b.hitFactor),
+                    },
+                    {
+                        title: "Points",
+                        dataIndex: "points",
+                        key: "points",
+                        sorter: (a, b) => Number(a.points) - Number(b.points),
                     },
                     {
                         title: "Alpha",

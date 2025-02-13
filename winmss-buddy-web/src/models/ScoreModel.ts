@@ -15,4 +15,5 @@ export interface ScoreModel {
     delta: number;
     mike: number;
     penalty: number;
+    stagePoints: number;
 }

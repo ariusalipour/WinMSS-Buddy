@@ -77,6 +77,7 @@ export class MatchesController {
         return filteredStages.map<StageModel>(s => ({
             stageNumber: s.stageId,
             stageName: s.stageName,
+            maxPoints: s.maxPoints,
             scoreCount: s.noOfScores,
         }));
     }
@@ -138,43 +139,104 @@ export class MatchesController {
                 const competitor = this.competitors.find(
                     c => registration?.memberId === c.memberId
                 );
-                const stage = this.stages.find(s => score.stageId === s.stageId);
-                return { ...score, registration, competitor, stage };
+                return { ...score, registration, competitor };
             });
 
-        const highestHitFactor =
-            filteredScores.length > 0
-                ? Math.max(...filteredScores.map(s => s.hitFactor || 0))
-                : 0;
+        if (stageNo === undefined) {
+            // Aggregate scores by competitor for overall results
+            const aggregatedScores = filteredScores.reduce((acc, score) => {
+                const key = score.memberId;
+                if (!acc[key]) {
+                    acc[key] = { ...score, shootTime: 0, scoreA: 0, scoreB: 0, scoreC: 0, scoreD: 0, misses: 0, penalties: 0, competitor: score.competitor, registration: score.registration };
+                }
+                acc[key].shootTime += score.shootTime;
+                acc[key].scoreA += score.scoreA;
+                acc[key].scoreB += score.scoreB;
+                acc[key].scoreC += score.scoreC;
+                acc[key].scoreD += score.scoreD;
+                acc[key].misses += score.misses;
+                acc[key].penalties += score.penalties;
+                return acc;
+            }, {} as { [key: number]: Score & { competitor?: Competitor, registration?: Registration } });
 
-        const scoresWithPercentages = filteredScores.map(s => {
-            const percentage =
-                highestHitFactor > 0 ? ((s.hitFactor || 0) / highestHitFactor) * 100 : 0;
-            return { ...s, percentage: percentage.toFixed(2) };
-        });
+            const aggregatedScoresArray = Object.values(aggregatedScores);
 
-        scoresWithPercentages.sort(
-            (a, b) => parseFloat(b.percentage) - parseFloat(a.percentage)
-        );
+            const highestStagePoints =
+                aggregatedScoresArray.length > 0
+                    ? Math.max(...aggregatedScoresArray.map(s => s.finalScore || 0))
+                    : 0;
 
-        return scoresWithPercentages.map<ScoreModel>((s, index) => ({
-            position: index + 1,
-            firstName: s.competitor?.firstname || "",
-            lastName: s.competitor?.lastname || "",
-            category: s.registration?.categoryId?.toString() || "",
-            percentage: s.percentage,
-            points: s.finalScore,
-            time: s.shootTime,
-            division: s.registration?.divisionId?.toString() || "",
-            hitFactor: s.hitFactor,
-            alpha: s.scoreA,
-            beta: s.scoreB,
-            charlie: s.scoreC,
-            delta: s.scoreD,
-            mike: s.misses,
-            penalty: s.penalties,
-            stageNumber: s.stage?.stageId || 0,
-            key: `${s.stageId}-${s.memberId}`,
-        }));
+            const scoresWithPercentages = aggregatedScoresArray.map(s => {
+                const percentage =
+                    highestStagePoints > 0 ? (s.finalScore / highestStagePoints) * 100 : 0;
+                return { ...s, percentage: percentage.toFixed(2) };
+            });
+
+            scoresWithPercentages.sort(
+                (a, b) => parseFloat(b.percentage) - parseFloat(a.percentage)
+            );
+
+            return scoresWithPercentages.map<ScoreModel>((s, index) => ({
+                position: index + 1,
+                firstName: s.competitor?.firstname || "",
+                lastName: s.competitor?.lastname || "",
+                category: s.registration?.categoryId?.toString() || "",
+                percentage: s.percentage,
+                points: s.finalScore,
+                time: s.shootTime,
+                division: s.registration?.divisionId?.toString() || "",
+                alpha: s.scoreA,
+                beta: s.scoreB,
+                charlie: s.scoreC,
+                delta: s.scoreD,
+                mike: s.misses,
+                penalty: s.penalties,
+                stageNumber: 0, // Not applicable for overall results
+                hitFactor: 0, // Not applicable for overall results
+                stagePoints: s.finalScore,
+                key: `${s.memberId}`,
+            }));
+        } else {
+            // Calculate stage results
+            const stage = this.stages.find(stage => stage.stageId === stageNo);
+            const maxPoints = stage ? stage.maxPoints : 0;
+
+            const highestHitFactor =
+                filteredScores.length > 0
+                    ? Math.max(...filteredScores.map(s => s.hitFactor || 0))
+                    : 0;
+
+            const scoresWithPercentages = filteredScores.map(s => {
+                const percentage =
+                    highestHitFactor > 0 ? ((s.hitFactor || 0) / highestHitFactor) * 100 : 0;
+                const stagePoints = percentage > 0 ? (maxPoints * (percentage / 100)) : 0;
+                return { ...s, percentage: percentage.toFixed(2), stagePoints };
+            });
+
+            scoresWithPercentages.sort(
+                (a, b) => parseFloat(b.percentage) - parseFloat(a.percentage)
+            );
+
+            return scoresWithPercentages.map<ScoreModel>((s, index) => ({
+                position: index + 1,
+                firstName: s.competitor?.firstname || "",
+                lastName: s.competitor?.lastname || "",
+                category: s.registration?.categoryId?.toString() || "",
+                percentage: s.percentage,
+                points: s.finalScore,
+                time: s.shootTime,
+                division: s.registration?.divisionId?.toString() || "",
+                alpha: s.scoreA,
+                beta: s.scoreB,
+                charlie: s.scoreC,
+                delta: s.scoreD,
+                mike: s.misses,
+                penalty: s.penalties,
+                stageNumber: s.stageId,
+                hitFactor: s.hitFactor,
+                stagePoints: s.stagePoints,
+                key: `${s.stageId}-${s.memberId}`,
+            }));
+        }
     }
 }
