@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Table, Select } from "antd";
 import { OverallScoreModel } from "../../models/OverallScoreModel";
 import { MatchesController } from "../../controllers/MatchesController";
