@@ -230,6 +230,7 @@ function processFile(rawContent: string) {
 		scoreD: parseInt(attributes.ScoreD, 10),
 		misses: parseInt(attributes.Misses, 10),
 		penalties: parseInt(attributes.Penalties, 10),
+		proceduralErrors: parseInt(attributes.ProcError, 10),
 		shootTime: parseFloat(attributes.ShootTime),
 		hitFactor: parseFloat(attributes.HitFactor),
 		finalScore: parseInt(attributes.FinalScore, 10),

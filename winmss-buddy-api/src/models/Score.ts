@@ -8,6 +8,7 @@ export interface Score {
 	scoreD: number;
 	misses: number;
 	penalties: number;
+	proceduralErrors: number;
 	shootTime: number;
 	hitFactor: number;
 	finalScore: number;
