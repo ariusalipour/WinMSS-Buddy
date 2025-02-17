@@ -11,8 +11,10 @@ export const uploadRawData = async (formData: FormData): Promise<MatchesResults>
     return response.data; // Assuming the API returns `ProcessedData`
 };
 
-export const processMergeCompetitorsData = async (matchesResults: MatchesResults): Promise<void> => {
-    await axios.post(`${API_BASE_URL}/process/merge-competitors-data`, matchesResults, {
+export const processMergeCompetitorsData = async (matchesResults: MatchesResults): Promise<MatchesResults> => {
+    const response = await axios.post(`${API_BASE_URL}/process/merge-competitors-data`, matchesResults, {
         headers: { "Content-Type": "application/json" },
     });
+
+    return response.data;
 };
