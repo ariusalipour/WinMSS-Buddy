@@ -7,12 +7,15 @@ export interface OverallScoreModel {
     points: number;
     time: number;
     division: string;
+    class: string;
+    powerFactor: string;
     alpha: number;
     beta: number;
     charlie: number;
     delta: number;
     mike: number;
-    penalty: number;
+    noShoot: number;
+    procedural: number;
     stagePoints: number;
     key: string;
 }

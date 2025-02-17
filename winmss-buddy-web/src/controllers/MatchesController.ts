@@ -193,10 +193,13 @@ export class MatchesController {
             charlie: s.scoreC,
             delta: s.scoreD,
             mike: s.misses,
-            penalty: s.penalties,
+            noShoot: s.penalties,
             stageNumber: s.stageId,
             hitFactor: s.hitFactor,
             stagePoints: s.stagePoints,
+            class: s.competitor?.classId || "",
+            powerFactor: s.registration?.MajorPF ? "Major" : "Minor",
+            procedural: s.proceduralErrors,
             key: `${s.stageId}-${s.memberId}`,
         }));
     }
@@ -208,7 +211,7 @@ export class MatchesController {
         const overallScores = allScores.reduce((acc, score) => {
             const key = `${score.firstName}-${score.lastName}-${score.category}-${score.division}`;
             if (!acc[key]) {
-                acc[key] = { ...score, totalPoints: 0, totalTime: 0, totalAlpha: 0, totalBeta: 0, totalCharlie: 0, totalDelta: 0, totalMike: 0, totalPenalty: 0, totalStagePoints: 0 };
+                acc[key] = { ...score, totalPoints: 0, totalTime: 0, totalAlpha: 0, totalBeta: 0, totalCharlie: 0, totalDelta: 0, totalMike: 0, totalPenalty: 0, totalProcedural: 0, totalStagePoints: 0 };
             }
             acc[key].totalPoints += score.stagePoints;
             acc[key].totalTime += score.time;
@@ -217,10 +220,11 @@ export class MatchesController {
             acc[key].totalCharlie += score.charlie;
             acc[key].totalDelta += score.delta;
             acc[key].totalMike += score.mike;
-            acc[key].totalPenalty += score.penalty;
+            acc[key].totalPenalty += score.noShoot;
+            acc[key].totalProcedural += score.procedural;
             acc[key].totalStagePoints += score.stagePoints;
             return acc;
-        }, {} as { [key: string]: ScoreModel & { totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalStagePoints: number } });
+        }, {} as { [key: string]: ScoreModel & { totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalProcedural: number; totalStagePoints: number } });
 
         const sortedOverallScores = Object.values(overallScores).sort((a, b) => b.totalPoints - a.totalPoints);
 
@@ -233,12 +237,15 @@ export class MatchesController {
             points: s.totalPoints,
             time: s.totalTime,
             division: s.division,
+            class: s.class,
+            powerFactor: s.powerFactor,
             alpha: s.totalAlpha,
             beta: s.totalBeta,
             charlie: s.totalCharlie,
             delta: s.totalDelta,
             mike: s.totalMike,
-            penalty: s.totalPenalty,
+            noShoot: s.totalPenalty,
+            procedural: s.totalProcedural,
             stagePoints: s.totalStagePoints,
             key: `${s.firstName}-${s.lastName}-${s.category}-${s.division}`
         }));

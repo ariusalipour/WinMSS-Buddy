@@ -103,6 +103,7 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                 dataSource={scoreModels}
                 rowKey="position"
                 columns={[
+                    { title: "Position", dataIndex: "position", key: "position", sorter: (a, b) => a.position - b.position },
                     { title: "First Name", dataIndex: "firstName", key: "firstName", sorter: (a, b) => a.firstName.localeCompare(b.firstName) },
                     { title: "Last Name", dataIndex: "lastName", key: "lastName", sorter: (a, b) => a.lastName.localeCompare(b.lastName) },
                     { title: "Percentage", dataIndex: "percentage", key: "percentage", sorter: (a, b) => parseFloat(a.percentage) - parseFloat(b.percentage), render: (text: string) => parseFloat(text).toFixed(2) },
@@ -119,7 +120,6 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                     { title: "Charlie", dataIndex: "charlie", key: "charlie", sorter: (a, b) => a.charlie - b.charlie },
                     { title: "Delta", dataIndex: "delta", key: "delta", sorter: (a, b) => a.delta - b.delta },
                     { title: "Mike", dataIndex: "mike", key: "mike", sorter: (a, b) => a.mike - b.mike },
-                    { title: "Penalty", dataIndex: "penalty", key: "penalty", sorter: (a, b) => a.penalty - b.penalty },
                     { title: "No Shoot", dataIndex: "noShoot", key: "noShoot", sorter: (a, b) => a.noShoot - b.noShoot },
                     { title: "Procedural", dataIndex: "procedural", key: "procedural", sorter: (a, b) => a.procedural - b.procedural },
                 ]}

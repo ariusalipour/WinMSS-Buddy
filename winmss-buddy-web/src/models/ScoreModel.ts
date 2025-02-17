@@ -14,7 +14,6 @@ export interface ScoreModel {
     charlie: number;
     delta: number;
     mike: number;
-    penalty: number;
     stagePoints: number;
     class: string;
     powerFactor: string;
