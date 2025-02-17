@@ -133,10 +133,24 @@ function createCompetitorMerges(competitors: Competitor[], registrations: Regist
 		groupedCompetitors[key].push(competitor);
 	});
 
-	// Create merges within each group
+	// Create merges within each group, excluding competitors from the same match
 	Object.values(groupedCompetitors).forEach(group => {
-		if (group.length > 1) {
-			const [main, ...rest] = group;
+		const matchGroups: Record<number, Competitor[]> = {};
+
+		group.forEach(competitor => {
+			const registration = registrations.find(r => r.memberId === competitor.memberId);
+			if (registration) {
+				const matchId = registration.matchId;
+				if (!matchGroups[matchId]) {
+					matchGroups[matchId] = [];
+				}
+				matchGroups[matchId].push(competitor);
+			}
+		});
+
+		const allCompetitors = Object.values(matchGroups).flat();
+		if (allCompetitors.length > 1) {
+			const [main, ...rest] = allCompetitors;
 			merges.push({
 				memberId: main.memberId,
 				mergeMemberIds: rest.map(competitor => competitor.memberId),
