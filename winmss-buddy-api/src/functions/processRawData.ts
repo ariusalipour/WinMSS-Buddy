@@ -99,7 +99,7 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 			combinedData.stages.push(...parsedData.stages);
 		}
 
-		const competitorMerges = createCompetitorMerges(combinedData.competitors);
+		const competitorMerges = createCompetitorMerges(combinedData.competitors, combinedData.registrations);
 		combinedData.competitorMerges = competitorMerges;
 
 		const processedData: MatchesResults = {
@@ -120,27 +120,38 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 	}
 }
 
-function createCompetitorMerges(competitors: Competitor[]): CompetitorMerge[] {
+function createCompetitorMerges(competitors: Competitor[], registrations: Registration[]): CompetitorMerge[] {
 	const merges: CompetitorMerge[] = [];
-	const keyMap: Record<string, Competitor[]> = {};
+	const groupedByMatch: Record<number, Record<string, Competitor[]>> = {};
 
-	for (const competitor of competitors) {
-		const key = `${competitor.lastname}-${competitor.firstname.charAt(0).toUpperCase()}`;
-		if (!keyMap[key]) {
-			keyMap[key] = [];
+	// Group competitors by matchId and then by lastname and first initial
+	competitors.forEach(competitor => {
+		const registration = registrations.find(r => r.memberId === competitor.memberId);
+		if (registration) {
+			const matchId = registration.matchId;
+			if (!groupedByMatch[matchId]) {
+				groupedByMatch[matchId] = {};
+			}
+			const key = `${competitor.lastname}-${competitor.firstname.charAt(0).toUpperCase()}`;
+			if (!groupedByMatch[matchId][key]) {
+				groupedByMatch[matchId][key] = [];
+			}
+			groupedByMatch[matchId][key].push(competitor);
 		}
-		keyMap[key].push(competitor);
-	}
+	});
 
-	for (const [key, group] of Object.entries(keyMap)) {
-		if (group.length > 1) {
-			const [main, ...rest] = group;
-			merges.push({
-				memberId: main.memberId,
-				mergeMemberIds: rest.map((competitor) => competitor.memberId),
-			});
-		}
-	}
+	// Create merges within each match group
+	Object.values(groupedByMatch).forEach(matchGroup => {
+		Object.values(matchGroup).forEach(group => {
+			if (group.length > 1) {
+				const [main, ...rest] = group;
+				merges.push({
+					memberId: main.memberId,
+					mergeMemberIds: rest.map(competitor => competitor.memberId),
+				});
+			}
+		});
+	});
 
 	return merges;
 }
