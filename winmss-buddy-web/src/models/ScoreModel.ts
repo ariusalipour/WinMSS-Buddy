@@ -16,4 +16,8 @@ export interface ScoreModel {
     mike: number;
     penalty: number;
     stagePoints: number;
+    class: string;
+    powerFactor: string;
+    noShoot: number;
+    procedural: number;
 }

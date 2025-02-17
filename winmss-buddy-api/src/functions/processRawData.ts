@@ -203,6 +203,7 @@ function processFile(rawContent: string) {
 		divisionId: parseInt(attributes.DivId, 10),
 		categoryId: parseInt(attributes.CatId, 10),
 		squadId: parseInt(attributes.SquadId, 10),
+		MajorPF: attributes.MajorPF === "True",
 		isDisqualified: attributes.IsDisq === "True",
 		disqualificationReason: attributes.DisqRuleId || undefined,
 		disqualificationDate: attributes.DisqDt || undefined,

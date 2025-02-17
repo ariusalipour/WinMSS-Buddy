@@ -5,6 +5,7 @@ export interface Registration {
 	divisionId: number;
 	categoryId: number;
 	squadId: number;
+	MajorPF: boolean;
 	isDisqualified: boolean;
 	disqualificationReason?: string;
 	disqualificationDate?: string;
