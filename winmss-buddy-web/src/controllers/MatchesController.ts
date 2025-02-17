@@ -11,6 +11,7 @@ import { StageModel } from "../models/StageModel";
 import { SquadModel } from "../models/SquadModel";
 import { ScoreModel } from "../models/ScoreModel";
 import {ApiResponse} from "../models/ApiResponse.ts";
+import {OverallScoreModel} from "../models/OverallScoreModel.ts";
 
 export class MatchesController {
     private matches: Match[];
@@ -197,6 +198,49 @@ export class MatchesController {
             hitFactor: s.hitFactor,
             stagePoints: s.stagePoints,
             key: `${s.stageId}-${s.memberId}`,
+        }));
+    }
+
+    getOverallScores(matchId: number, divisionId?: number, categoryId?: number): OverallScoreModel[] {
+        const stageModels = this.getStages(matchId);
+        const allScores = stageModels.flatMap(stage => this.getScores(matchId, stage.stageNumber, divisionId, categoryId));
+
+        const overallScores = allScores.reduce((acc, score) => {
+            const key = `${score.firstName}-${score.lastName}-${score.category}-${score.division}`;
+            if (!acc[key]) {
+                acc[key] = { ...score, totalPoints: 0, totalTime: 0, totalAlpha: 0, totalBeta: 0, totalCharlie: 0, totalDelta: 0, totalMike: 0, totalPenalty: 0, totalStagePoints: 0 };
+            }
+            acc[key].totalPoints += score.stagePoints;
+            acc[key].totalTime += score.time;
+            acc[key].totalAlpha += score.alpha;
+            acc[key].totalBeta += score.beta;
+            acc[key].totalCharlie += score.charlie;
+            acc[key].totalDelta += score.delta;
+            acc[key].totalMike += score.mike;
+            acc[key].totalPenalty += score.penalty;
+            acc[key].totalStagePoints += score.stagePoints;
+            return acc;
+        }, {} as { [key: string]: ScoreModel & { totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalStagePoints: number } });
+
+        const sortedOverallScores = Object.values(overallScores).sort((a, b) => b.totalPoints - a.totalPoints);
+
+        return sortedOverallScores.map((s, index) => ({
+            position: index + 1,
+            firstName: s.firstName,
+            lastName: s.lastName,
+            category: s.category,
+            percentage: ((s.totalPoints / sortedOverallScores[0].totalPoints) * 100).toFixed(2),
+            points: s.totalPoints,
+            time: s.totalTime,
+            division: s.division,
+            alpha: s.totalAlpha,
+            beta: s.totalBeta,
+            charlie: s.totalCharlie,
+            delta: s.totalDelta,
+            mike: s.totalMike,
+            penalty: s.totalPenalty,
+            stagePoints: s.totalStagePoints,
+            key: `${s.firstName}-${s.lastName}-${s.category}-${s.division}`
         }));
     }
 }

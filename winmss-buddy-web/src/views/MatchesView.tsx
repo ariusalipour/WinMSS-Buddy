@@ -1,10 +1,10 @@
-// src/views/MatchesView.tsx
 import React from "react";
 import { Tabs } from "antd";
 import CompetitorsTab from "../components/tabs/CompetitorsTab";
 import StagesTab from "../components/tabs/StagesTab";
 import SquadsTab from "../components/tabs/SquadsTab";
 import ScoresTab from "../components/tabs/ScoresTab";
+import OverallScoresTab from "../components/tabs/OverallScoresTab.tsx";
 import { useMatchesController } from "../hooks/useMatchesController";
 
 const { TabPane } = Tabs;
@@ -46,6 +46,9 @@ const MatchesView: React.FC = () => {
                                 </TabPane>
                                 <TabPane tab={`Scores (${scoreCount})`} key="4">
                                     <ScoresTab match={match} matchesController={matchesController} />
+                                </TabPane>
+                                <TabPane tab="Overall Scores" key="5">
+                                    <OverallScoresTab match={match} matchesController={matchesController} />
                                 </TabPane>
                             </Tabs>
                         </TabPane>
