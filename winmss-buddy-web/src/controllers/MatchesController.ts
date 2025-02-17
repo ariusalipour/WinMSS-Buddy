@@ -213,7 +213,7 @@ export class MatchesController {
             if (!acc[key]) {
                 acc[key] = { ...score, totalPoints: 0, totalTime: 0, totalAlpha: 0, totalBeta: 0, totalCharlie: 0, totalDelta: 0, totalMike: 0, totalPenalty: 0, totalProcedural: 0, totalStagePoints: 0 };
             }
-            acc[key].totalPoints += score.stagePoints;
+            acc[key].totalPoints += score.points;
             acc[key].totalTime += score.time;
             acc[key].totalAlpha += score.alpha;
             acc[key].totalBeta += score.beta;
@@ -226,14 +226,16 @@ export class MatchesController {
             return acc;
         }, {} as { [key: string]: ScoreModel & { totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalProcedural: number; totalStagePoints: number } });
 
-        const sortedOverallScores = Object.values(overallScores).sort((a, b) => b.totalPoints - a.totalPoints);
+        const highestStagePoints = Math.max(...Object.values(overallScores).map(s => s.totalStagePoints));
+
+        const sortedOverallScores = Object.values(overallScores).sort((a, b) => b.totalStagePoints - a.totalStagePoints);
 
         return sortedOverallScores.map((s, index) => ({
             position: index + 1,
             firstName: s.firstName,
             lastName: s.lastName,
             category: s.category,
-            percentage: ((s.totalPoints / sortedOverallScores[0].totalPoints) * 100).toFixed(2),
+            percentage: ((s.totalStagePoints / highestStagePoints) * 100).toFixed(2),
             points: s.totalPoints,
             time: s.totalTime,
             division: s.division,
