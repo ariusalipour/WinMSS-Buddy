@@ -1,23 +1,30 @@
-// ScoresTab.tsx
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Table, Select } from "antd";
 import { ScoreModel } from "../../models/ScoreModel";
 import { MatchesController } from "../../controllers/MatchesController";
+import {MatchModel} from "../../models/MatchModel.ts";
 
 const { Option } = Select;
 
 interface ScoresTabProps {
-    match: any;
+    match: MatchModel;
     matchesController: MatchesController;
 }
 
 const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
-    const [selectedStageId, setSelectedStageId] = useState<number | "overall">("overall");
+    const stageModels = matchesController.getStages(match.matchId);
+    const firstStageId = stageModels.length > 0 ? stageModels[0].stageNumber : undefined;
+
+    const [selectedStageId, setSelectedStageId] = useState<number | undefined>(firstStageId);
     const [selectedDivision, setSelectedDivision] = useState<string | "all">("all");
     const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
 
+    useEffect(() => {
+        setSelectedStageId(firstStageId);
+    }, [firstStageId]);
+
     const handleStageChange = (value: string) => {
-        setSelectedStageId(value === "overall" ? "overall" : Number(value));
+        setSelectedStageId(Number(value));
     };
 
     const handleDivisionChange = (value: string) => {
@@ -28,18 +35,13 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
         setSelectedCategory(value);
     };
 
-    // Get unique divisions and categories (assume these helper methods are added to MatchesController)
     const uniqueDivisions = matchesController.getUniqueDivisions(match.matchId);
     const uniqueCategories = matchesController.getUniqueCategories(match.matchId);
 
-    // Retrieve stage models for the stage dropdown
-    const stageModels = matchesController.getStages(match.matchId);
-
-    // Re-calculate the filtered scores every time a filter changes
     const scoreModels: ScoreModel[] = useMemo(() => {
         return matchesController.getScores(
             match.matchId,
-            selectedStageId === "overall" ? undefined : selectedStageId,
+            selectedStageId,
             selectedDivision === "all" ? undefined : Number(selectedDivision),
             selectedCategory === "all" ? undefined : Number(selectedCategory)
         );
@@ -55,13 +57,10 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
         <div>
             <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
                 <Select
-                    value={selectedStageId === "overall" ? "overall" : selectedStageId.toString()}
+                    value={selectedStageId?.toString()}
                     style={{ width: 200 }}
                     onChange={handleStageChange}
                 >
-                    <Option key="overall" value="overall">
-                        Overall Results
-                    </Option>
                     {stageModels.map((stage) => (
                         <Option key={String(stage.stageNumber)} value={String(stage.stageNumber)}>
                             {stage.stageName}
@@ -102,7 +101,7 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
 
             <Table<ScoreModel>
                 dataSource={scoreModels}
-                rowKey="position" // Ensure this is unique per score model (or use a dedicated key field)
+                rowKey="position"
                 columns={[
                     {
                         title: "Position",

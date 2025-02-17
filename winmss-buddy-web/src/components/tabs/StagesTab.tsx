@@ -2,12 +2,17 @@
 import React from "react";
 import { Table } from "antd";
 import { StageModel } from "../../models/StageModel";
+import {MatchesController} from "../../controllers/MatchesController.ts";
+import {MatchModel} from "../../models/MatchModel.ts";
 
 interface StagesTabProps {
-    stageModels: StageModel[];
+    match: MatchModel;
+    matchesController: MatchesController;
 }
 
-const StagesTab: React.FC<StagesTabProps> = ({ stageModels }) => {
+const StagesTab: React.FC<StagesTabProps> = ({ match, matchesController }) => {
+    const stageModels = matchesController.getStages(match.matchId);
+
     return (
         <Table<StageModel>
             dataSource={stageModels}

@@ -27,24 +27,24 @@ const MatchesView: React.FC = () => {
             <Tabs>
                 {matchModels.map((match, matchIndex) => {
                     // For each match, get the processed view models from the controller.
-                    const competitorModels = matchesController.getCompetitors(match.matchId);
-                    const stageModels = matchesController.getStages(match.matchId);
-                    const squadModels = matchesController.getSquads(match.matchId);
-                    const scoreModels = matchesController.getScores(match.matchId);
+                    const competitorCount = matchesController.getCompetitorCount(match.matchId);
+                    const stageCount = matchesController.getStageCount(match.matchId);
+                    const squadCount = matchesController.getSquadCount(match.matchId);
+                    const scoreCount = matchesController.getScoreCount(match.matchId);
 
                     return (
                         <TabPane tab={match.matchName} key={`match-${matchIndex}`}>
                             <Tabs defaultActiveKey="1">
-                                <TabPane tab={`Competitors (${competitorModels.length})`} key="1">
-                                    <CompetitorsTab competitorModels={competitorModels} />
+                                <TabPane tab={`Competitors (${competitorCount})`} key="1">
+                                    <CompetitorsTab match={match} matchesController={matchesController} />
                                 </TabPane>
-                                <TabPane tab={`Stages (${stageModels.length})`} key="2">
-                                    <StagesTab stageModels={stageModels} />
+                                <TabPane tab={`Stages (${stageCount})`} key="2">
+                                    <StagesTab match={match} matchesController={matchesController} />
                                 </TabPane>
-                                <TabPane tab={`Squads (${squadModels.length})`} key="3">
-                                    <SquadsTab squadModels={squadModels} />
+                                <TabPane tab={`Squads (${squadCount})`} key="3">
+                                    <SquadsTab match={match} matchesController={matchesController} />
                                 </TabPane>
-                                <TabPane tab={`Scores (${scoreModels.length})`} key="4">
+                                <TabPane tab={`Scores (${scoreCount})`} key="4">
                                     <ScoresTab match={match} matchesController={matchesController} />
                                 </TabPane>
                             </Tabs>

@@ -2,12 +2,17 @@
 import React from "react";
 import { Table } from "antd";
 import { CompetitorModel } from "../../models/CompetitorModel";
+import {MatchesController} from "../../controllers/MatchesController.ts";
+import {MatchModel} from "../../models/MatchModel.ts";
 
 interface CompetitorsTabProps {
-    competitorModels: CompetitorModel[];
+    match: MatchModel;
+    matchesController: MatchesController;
 }
 
-const CompetitorsTab: React.FC<CompetitorsTabProps> = ({ competitorModels }) => {
+const CompetitorsTab: React.FC<CompetitorsTabProps> = ({ match, matchesController }) => {
+    const competitorModels = matchesController.getCompetitors(match.matchId);
+
     return (
         <Table<CompetitorModel>
             dataSource={competitorModels}

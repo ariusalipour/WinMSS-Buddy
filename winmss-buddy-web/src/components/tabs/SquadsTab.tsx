@@ -2,12 +2,17 @@
 import React from "react";
 import { Table } from "antd";
 import { SquadModel } from "../../models/SquadModel";
+import {MatchesController} from "../../controllers/MatchesController.ts";
+import {MatchModel} from "../../models/MatchModel.ts";
 
 interface SquadsTabProps {
-    squadModels: SquadModel[];
+    match: MatchModel;
+    matchesController: MatchesController;
 }
 
-const SquadsTab: React.FC<SquadsTabProps> = ({ squadModels }) => {
+const SquadsTab: React.FC<SquadsTabProps> = ({ match, matchesController }) => {
+    const squadModels = matchesController.getSquads(match.matchId);
+
     return (
         <Table<SquadModel>
             dataSource={squadModels}
