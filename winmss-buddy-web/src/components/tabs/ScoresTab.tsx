@@ -117,13 +117,6 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                             parseFloat(a.percentage) - parseFloat(b.percentage),
                     },
                     {
-                        title: "Stage No",
-                        dataIndex: "stageNumber",
-                        key: "stageNumber",
-                        sorter: (a, b) =>
-                            Number(a.stageNumber) - Number(b.stageNumber),
-                    },
-                    {
                         title: "First Name",
                         dataIndex: "firstName",
                         key: "firstName",
@@ -150,12 +143,6 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                             String(a.category).localeCompare(String(b.category)),
                     },
                     {
-                        title: "Time",
-                        dataIndex: "time",
-                        key: "time",
-                        sorter: (a, b) => Number(a.time) - Number(b.time),
-                    },
-                    {
                         title: "Stage Points",
                         dataIndex: "stagePoints",
                         key: "stagePoints",
@@ -166,6 +153,12 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                         dataIndex: "hitFactor",
                         key: "hitFactor",
                         sorter: (a, b) => Number(a.hitFactor) - Number(b.hitFactor),
+                    },
+                    {
+                        title: "Time",
+                        dataIndex: "time",
+                        key: "time",
+                        sorter: (a, b) => Number(a.time) - Number(b.time),
                     },
                     {
                         title: "Points",
