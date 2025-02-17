@@ -122,35 +122,26 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 
 function createCompetitorMerges(competitors: Competitor[], registrations: Registration[]): CompetitorMerge[] {
 	const merges: CompetitorMerge[] = [];
-	const groupedByMatch: Record<number, Record<string, Competitor[]>> = {};
+	const groupedCompetitors: Record<string, Competitor[]> = {};
 
-	// Group competitors by matchId and then by lastname and first initial
+	// Group competitors by lastname and first initial
 	competitors.forEach(competitor => {
-		const registration = registrations.find(r => r.memberId === competitor.memberId);
-		if (registration) {
-			const matchId = registration.matchId;
-			if (!groupedByMatch[matchId]) {
-				groupedByMatch[matchId] = {};
-			}
-			const key = `${competitor.lastname}-${competitor.firstname.charAt(0).toUpperCase()}`;
-			if (!groupedByMatch[matchId][key]) {
-				groupedByMatch[matchId][key] = [];
-			}
-			groupedByMatch[matchId][key].push(competitor);
+		const key = `${competitor.lastname}-${competitor.firstname.charAt(0).toUpperCase()}`;
+		if (!groupedCompetitors[key]) {
+			groupedCompetitors[key] = [];
 		}
+		groupedCompetitors[key].push(competitor);
 	});
 
-	// Create merges within each match group
-	Object.values(groupedByMatch).forEach(matchGroup => {
-		Object.values(matchGroup).forEach(group => {
-			if (group.length > 1) {
-				const [main, ...rest] = group;
-				merges.push({
-					memberId: main.memberId,
-					mergeMemberIds: rest.map(competitor => competitor.memberId),
-				});
-			}
-		});
+	// Create merges within each group
+	Object.values(groupedCompetitors).forEach(group => {
+		if (group.length > 1) {
+			const [main, ...rest] = group;
+			merges.push({
+				memberId: main.memberId,
+				mergeMemberIds: rest.map(competitor => competitor.memberId),
+			});
+		}
 	});
 
 	return merges;
