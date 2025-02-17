@@ -12,7 +12,7 @@ const MergeView: React.FC = () => {
     const competitors = mergeController.getCompetitors();
     const competitorMerges = mergeController.getCompetitorMerges();
 
-    const [selectedMerges, setSelectedMerges] = useState<{ [key: number]: number[] }>({});
+    const [, setSelectedMerges] = useState<{ [key: number]: number[] }>({});
 
     const handleMergeChange = (memberId: number, mergeMemberIds: number[]) => {
         setSelectedMerges(prev => {
