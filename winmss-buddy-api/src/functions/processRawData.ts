@@ -148,13 +148,23 @@ function createCompetitorMerges(competitors: Competitor[], registrations: Regist
 			}
 		});
 
-		const allCompetitors = Object.values(matchGroups).flat();
-		if (allCompetitors.length > 1) {
-			const [main, ...rest] = allCompetitors;
-			merges.push({
-				memberId: main.memberId,
-				mergeMemberIds: rest.map(competitor => competitor.memberId),
-			});
+		// Compare competitors across different matches
+		const matchIds = Object.keys(matchGroups).map(Number);
+		for (let i = 0; i < matchIds.length; i++) {
+			for (let j = i + 1; j < matchIds.length; j++) {
+				const group1 = matchGroups[matchIds[i]];
+				const group2 = matchGroups[matchIds[j]];
+
+				group1.forEach(main => {
+					const mergeMemberIds = group2.map(competitor => competitor.memberId);
+					if (mergeMemberIds.length > 0) {
+						merges.push({
+							memberId: main.memberId,
+							mergeMemberIds: mergeMemberIds,
+						});
+					}
+				});
+			}
 		}
 	});
 
