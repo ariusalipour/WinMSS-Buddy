@@ -99,9 +99,9 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 			combinedData.stages.push(...parsedData.stages);
 		}
 
-		// const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
-		// combinedData.competitors = updatedCompetitors;
-		// combinedData.registrations = updatedRegistrations;
+		const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
+		combinedData.competitors = updatedCompetitors;
+		combinedData.registrations = updatedRegistrations;
 
 
 		const competitorMerges = createCompetitorMerges(combinedData.competitors, combinedData.registrations);
@@ -137,23 +137,20 @@ function mergeKnownCompetitors(competitors: Competitor[], registrations: Registr
 			mergedCompetitors.push(competitor);
 		} else {
 			const existingCompetitor = competitorMap[key];
+			const smallerMemberId = Math.min(competitor.memberId, existingCompetitor.memberId);
+			const largerMemberId = Math.max(competitor.memberId, existingCompetitor.memberId);
+
+			// Update registrations to the smaller memberId
+			updatedRegistrations.forEach(registration => {
+				if (registration.memberId === largerMemberId) {
+					registration.memberId = smallerMemberId;
+				}
+			});
+
+			// Replace the existing competitor with the current one if it has a smaller memberId
 			if (competitor.memberId < existingCompetitor.memberId) {
-				// Update registrations to the smaller memberId
-				updatedRegistrations.forEach(registration => {
-					if (registration.memberId === existingCompetitor.memberId) {
-						registration.memberId = competitor.memberId;
-					}
-				});
-				// Replace the existing competitor with the current one
 				competitorMap[key] = competitor;
 				mergedCompetitors[mergedCompetitors.indexOf(existingCompetitor)] = competitor;
-			} else {
-				// Update registrations to the smaller memberId
-				updatedRegistrations.forEach(registration => {
-					if (registration.memberId === competitor.memberId) {
-						registration.memberId = existingCompetitor.memberId;
-					}
-				});
 			}
 		}
 	});
