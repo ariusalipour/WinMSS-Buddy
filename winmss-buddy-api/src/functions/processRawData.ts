@@ -99,9 +99,9 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 			combinedData.stages.push(...parsedData.stages);
 		}
 
-		const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
-		combinedData.competitors = updatedCompetitors;
-		combinedData.registrations = updatedRegistrations;
+		// const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
+		// combinedData.competitors = updatedCompetitors;
+		// combinedData.registrations = updatedRegistrations;
 
 
 		const competitorMerges = createCompetitorMerges(combinedData.competitors, combinedData.registrations);
