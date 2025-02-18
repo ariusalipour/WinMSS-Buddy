@@ -99,6 +99,11 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 			combinedData.stages.push(...parsedData.stages);
 		}
 
+		const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
+		combinedData.competitors = updatedCompetitors;
+		combinedData.registrations = updatedRegistrations;
+
+
 		const competitorMerges = createCompetitorMerges(combinedData.competitors, combinedData.registrations);
 		combinedData.competitorMerges = competitorMerges;
 
@@ -118,6 +123,42 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 	} catch (err: any) {
 		return new Response(`Error processing files: ${err.message}`, { status: 500 });
 	}
+}
+
+function mergeKnownCompetitors(competitors: Competitor[], registrations: Registration[]): { updatedCompetitors: Competitor[], updatedRegistrations: Registration[] } {
+	const mergedCompetitors: Competitor[] = [];
+	const competitorMap: Record<string, Competitor> = {};
+	const updatedRegistrations = [...registrations];
+
+	competitors.forEach(competitor => {
+		const key = `${competitor.firstname.toLowerCase()}-${competitor.lastname.toLowerCase()}-${competitor.female}`;
+		if (!competitorMap[key]) {
+			competitorMap[key] = competitor;
+			mergedCompetitors.push(competitor);
+		} else {
+			const existingCompetitor = competitorMap[key];
+			if (competitor.memberId < existingCompetitor.memberId) {
+				// Update registrations to the smaller memberId
+				updatedRegistrations.forEach(registration => {
+					if (registration.memberId === existingCompetitor.memberId) {
+						registration.memberId = competitor.memberId;
+					}
+				});
+				// Replace the existing competitor with the current one
+				competitorMap[key] = competitor;
+				mergedCompetitors[mergedCompetitors.indexOf(existingCompetitor)] = competitor;
+			} else {
+				// Update registrations to the smaller memberId
+				updatedRegistrations.forEach(registration => {
+					if (registration.memberId === competitor.memberId) {
+						registration.memberId = existingCompetitor.memberId;
+					}
+				});
+			}
+		}
+	});
+
+	return { updatedCompetitors: mergedCompetitors, updatedRegistrations };
 }
 
 function createCompetitorMerges(competitors: Competitor[], registrations: Registration[]): CompetitorMerge[] {
