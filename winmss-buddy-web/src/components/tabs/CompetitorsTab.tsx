@@ -19,6 +19,12 @@ const CompetitorsTab: React.FC<CompetitorsTabProps> = ({ match, matchesControlle
             rowKey="competitorId" // Use a unique identifier from your view model
             columns={[
                 {
+                    title: "Member ID",
+                    dataIndex: "memberId",
+                    key: "memberId",
+                    sorter: (a, b) => a.memberId - b.memberId,
+                },
+                {
                     title: "First Name",
                     dataIndex: "firstName",
                     key: "firstName",

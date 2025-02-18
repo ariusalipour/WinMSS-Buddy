@@ -70,6 +70,7 @@ export class MatchesController {
         >;
 
         return filteredCompetitors.map<CompetitorModel>(c => ({
+            memberId: c.memberId,
             competitorId: c.memberId,
             firstName: c.firstname,
             lastName: c.lastname,

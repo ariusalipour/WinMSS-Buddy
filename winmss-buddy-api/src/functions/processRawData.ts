@@ -223,7 +223,52 @@ function createCompetitorMerges(competitors: Competitor[], registrations: Regist
 		}
 	});
 
-	return merges;
+	// Group merges by similar memberIds
+	const mergeMap: Record<number, Set<number>> = {};
+	merges.forEach(merge => {
+		if (!mergeMap[merge.memberId]) {
+			mergeMap[merge.memberId] = new Set();
+		}
+		merge.mergeMemberIds.forEach(id => {
+			mergeMap[merge.memberId].add(id);
+			if (!mergeMap[id]) {
+				mergeMap[id] = new Set();
+			}
+			mergeMap[id].add(merge.memberId);
+		});
+	});
+
+	const finalMerges: CompetitorMerge[] = [];
+	const visited = new Set<number>();
+
+	Object.keys(mergeMap).forEach(key => {
+		const memberId = parseInt(key, 10);
+		if (!visited.has(memberId)) {
+			const mergeSet = new Set<number>();
+			const stack = [memberId];
+
+			while (stack.length > 0) {
+				const currentId = stack.pop()!;
+				if (!visited.has(currentId)) {
+					visited.add(currentId);
+					mergeSet.add(currentId);
+					mergeMap[currentId].forEach(id => {
+						if (!visited.has(id)) {
+							stack.push(id);
+						}
+					});
+				}
+			}
+
+			const mergeArray = Array.from(mergeSet);
+			finalMerges.push({
+				memberId: mergeArray[0],
+				mergeMemberIds: mergeArray.slice(1),
+			});
+		}
+	});
+
+	return finalMerges;
 }
 
 function processFile(rawContent: string) {
