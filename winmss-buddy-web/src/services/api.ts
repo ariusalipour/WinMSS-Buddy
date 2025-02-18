@@ -1,7 +1,7 @@
 import axios from "axios";
 import { MatchesResults } from "../../../winmss-buddy-api/src/models/MatchesResults";
 
-const API_BASE_URL = "https://winmss-buddy-api.mochachino.app"; // Update to your API base URL
+const API_BASE_URL = "https://winmss-buddy-api.mockachino.app"; // Update to your API base URL
 
 export const uploadRawData = async (formData: FormData): Promise<MatchesResults> => {
     const response = await axios.post(`${API_BASE_URL}/process/raw-data`, formData, {
