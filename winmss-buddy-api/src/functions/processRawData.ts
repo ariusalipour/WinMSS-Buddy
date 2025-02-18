@@ -99,9 +99,14 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 			combinedData.stages.push(...parsedData.stages);
 		}
 
-		const { updatedCompetitors, updatedRegistrations } = mergeKnownCompetitors(combinedData.competitors, combinedData.registrations);
+		const { updatedCompetitors, updatedRegistrations, updatedScores } = mergeKnownCompetitors(
+			combinedData.competitors,
+			combinedData.registrations,
+			combinedData.scores
+		);
 		combinedData.competitors = updatedCompetitors;
 		combinedData.registrations = updatedRegistrations;
+		combinedData.scores = updatedScores;
 
 
 		const competitorMerges = createCompetitorMerges(combinedData.competitors, combinedData.registrations);
@@ -125,10 +130,15 @@ export async function handleProcessRawData(request: Request): Promise<Response> 
 	}
 }
 
-function mergeKnownCompetitors(competitors: Competitor[], registrations: Registration[]): { updatedCompetitors: Competitor[], updatedRegistrations: Registration[] } {
+function mergeKnownCompetitors(
+	competitors: Competitor[],
+	registrations: Registration[],
+	scores: Score[]
+): { updatedCompetitors: Competitor[], updatedRegistrations: Registration[], updatedScores: Score[] } {
 	const mergedCompetitors: Competitor[] = [];
 	const competitorMap: Record<string, Competitor> = {};
 	const updatedRegistrations = [...registrations];
+	const updatedScores = [...scores];
 
 	competitors.forEach(competitor => {
 		const key = `${competitor.firstname.toLowerCase()}-${competitor.lastname.toLowerCase()}-${competitor.female}`;
@@ -147,6 +157,13 @@ function mergeKnownCompetitors(competitors: Competitor[], registrations: Registr
 				}
 			});
 
+			// Update scores to the smaller memberId
+			updatedScores.forEach(score => {
+				if (score.memberId === largerMemberId) {
+					score.memberId = smallerMemberId;
+				}
+			});
+
 			// Replace the existing competitor with the current one if it has a smaller memberId
 			if (competitor.memberId < existingCompetitor.memberId) {
 				competitorMap[key] = competitor;
@@ -155,7 +172,7 @@ function mergeKnownCompetitors(competitors: Competitor[], registrations: Registr
 		}
 	});
 
-	return { updatedCompetitors: mergedCompetitors, updatedRegistrations };
+	return { updatedCompetitors: mergedCompetitors, updatedRegistrations, updatedScores };
 }
 
 function createCompetitorMerges(competitors: Competitor[], registrations: Registration[]): CompetitorMerge[] {
