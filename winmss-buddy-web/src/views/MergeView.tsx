@@ -1,29 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Select, Button, Row, Col } from "antd";
+import { Select, Button, Row, Col, Typography } from "antd";
 import { useAppContext } from "../context/AppContext";
 import { MergeController } from "../controllers/MergeController.ts";
 
 const { Option } = Select;
+const { Title, Paragraph } = Typography;
 
 const MergeView: React.FC = () => {
     const { apiResponse, setApiResponse } = useAppContext();
-    const mergeController = new MergeController(apiResponse!, setApiResponse);
+
+    if (!apiResponse) {
+        return <div>No competitors to display. Please upload data to view matches.</div>;
+    }
+
+    const mergeController = new MergeController(apiResponse, setApiResponse);
 
     const competitors = mergeController.getCompetitors();
     const competitorMerges = mergeController.getCompetitorMerges();
 
-    const [selectedMerges, setSelectedMerges] = useState<{ mainId: number, mergeIds: number[] }[]>([]);
+    const [selectedMerges, setSelectedMerges] = useState<{ mainId: number, mergeIds: number[], prepopulated: boolean }[]>([]);
 
     useEffect(() => {
         const initialMerges = competitorMerges.map(merge => ({
             mainId: merge.memberId,
-            mergeIds: merge.mergeMemberIds
+            mergeIds: merge.mergeMemberIds,
+            prepopulated: true
         }));
         setSelectedMerges(initialMerges);
     }, [competitorMerges]);
 
     const handleAddRow = () => {
-        setSelectedMerges([...selectedMerges, { mainId: 0, mergeIds: [] }]);
+        setSelectedMerges([...selectedMerges, { mainId: 0, mergeIds: [], prepopulated: false }]);
     };
 
     const handleDeleteRow = (index: number) => {
@@ -72,6 +79,12 @@ const MergeView: React.FC = () => {
 
     return (
         <div>
+            <Title level={1}>Merge View</Title>
+            <Paragraph>
+                This view allows you to manage competitor merges. You can add new rows to create merges,
+                select main competitors and competitors to merge, and process or clear all merges.
+            </Paragraph>
+            <Paragraph>Pre populated rows cannot be edited but can be deleted.</Paragraph>
             <Row justify="end" style={{ marginBottom: "16px" }}>
                 <Button
                     type="primary"
@@ -112,6 +125,7 @@ const MergeView: React.FC = () => {
                                 }
                                 return false;
                             }}
+                            disabled={merge.prepopulated}
                         >
                             {competitors
                                 .filter(c => !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))
@@ -137,6 +151,7 @@ const MergeView: React.FC = () => {
                                 }
                                 return false;
                             }}
+                            disabled={merge.prepopulated}
                         >
                             {competitors
                                 .filter(c => c.memberId !== merge.mainId && !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))

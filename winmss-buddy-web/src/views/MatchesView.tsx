@@ -1,11 +1,13 @@
 import React from "react";
-import { Tabs } from "antd";
+import {Tabs, Typography} from "antd";
 import CompetitorsTab from "../components/tabs/CompetitorsTab";
 import StagesTab from "../components/tabs/StagesTab";
 import SquadsTab from "../components/tabs/SquadsTab";
 import ScoresTab from "../components/tabs/ScoresTab";
 import OverallScoresTab from "../components/tabs/OverallScoresTab.tsx";
 import { useMatchesController } from "../hooks/useMatchesController";
+
+const { Title, Paragraph } = Typography;
 
 const { TabPane } = Tabs;
 
@@ -23,7 +25,8 @@ const MatchesView: React.FC = () => {
 
     return (
         <div>
-            <h2>Matches</h2>
+            <Title>Matches</Title>
+            <Paragraph>This view allows you to see the data from the files including scores and overall scores.</Paragraph>
             <Tabs>
                 {matchModels.map((match, matchIndex) => {
                     // For each match, get the processed view models from the controller.
