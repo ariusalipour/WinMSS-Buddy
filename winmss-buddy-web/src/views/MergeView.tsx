@@ -89,8 +89,8 @@ const MergeView: React.FC = () => {
                         <Select
                             style={{ width: "100%" }}
                             placeholder="Select main competitor"
-                            value={merge.mainId ? `${competitors.find(c => c.memberId === merge.mainId)?.firstname} ${competitors.find(c => c.memberId === merge.mainId)?.lastname} (${merge.mainId})` : undefined}
-                            onChange={value => handleMainChange(index, competitors.find(c => `${c.firstname} ${c.lastname} (${c.memberId})` === value)?.memberId || 0)}
+                            value={merge.mainId ? `${competitors.find(c => c.memberId === merge.mainId)?.firstname} ${competitors.find(c => c.memberId === merge.mainId)?.lastname} ${competitors.find(c => c.memberId === merge.mainId)?.memberId}` : undefined}
+                            onChange={value => handleMainChange(index, competitors.find(c => `${c.firstname} ${c.lastname} ${c.memberId}` === value)?.memberId || 0)}
                             showSearch
                             filterOption={(input, option) => {
                                 const children = option?.children as React.ReactNode;
@@ -103,8 +103,8 @@ const MergeView: React.FC = () => {
                             {competitors
                                 .filter(c => !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))
                                 .map(c => (
-                                    <Option key={c.memberId} value={`${c.firstname} ${c.lastname} (${c.memberId})`}>
-                                        {c.firstname + " " + c.lastname} ({c.memberId})
+                                    <Option key={c.memberId} value={`${c.firstname} ${c.lastname} + ${c.memberId}`}>
+                                        {c.firstname + " " + c.lastname + " " + c.memberId}
                                     </Option>
                                 ))}
                         </Select>
@@ -114,8 +114,8 @@ const MergeView: React.FC = () => {
                             mode="multiple"
                             style={{ width: "100%" }}
                             placeholder="Select competitors to merge"
-                            value={merge.mergeIds.map(id => `${competitors.find(c => c.memberId === id)?.firstname} ${competitors.find(c => c.memberId === id)?.lastname} (${id})`)}
-                            onChange={value => handleMergeChange(index, value.map(name => competitors.find(c => `${c.firstname} ${c.lastname} (${c.memberId})` === name)?.memberId || 0))}
+                            value={merge.mergeIds.map(id => `${competitors.find(c => c.memberId === id)?.firstname} ${competitors.find(c => c.memberId === id)?.lastname} ${competitors.find(c => c.memberId === merge.mainId)?.memberId}`)}
+                            onChange={value => handleMergeChange(index, value.map(name => competitors.find(c => `${c.firstname} ${c.lastname} ${c.memberId}` === name)?.memberId || 0))}
                             showSearch
                             filterOption={(input, option) => {
                                 const children = option?.children as React.ReactNode;
@@ -128,8 +128,8 @@ const MergeView: React.FC = () => {
                             {competitors
                                 .filter(c => c.memberId !== merge.mainId && !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))
                                 .map(c => (
-                                    <Option key={c.memberId} value={`${c.firstname} ${c.lastname} (${c.memberId})`}>
-                                        {c.firstname + " " + c.lastname} ({c.memberId})
+                                    <Option key={c.memberId} value={`${c.firstname} ${c.lastname} ${c.memberId}`}>
+                                        {c.firstname + " " + c.lastname + " " + c.memberId}
                                     </Option>
                                 ))}
                         </Select>
