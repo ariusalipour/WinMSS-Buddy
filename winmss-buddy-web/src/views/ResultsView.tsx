@@ -20,8 +20,8 @@ const ResultsView: React.FC = () => {
     const numberOfMatches = matchesController.getMatches().length;
 
     const [selectedBestOf, setSelectedBestOf] = useState<number>(1);
-    const [selectedDivision, setSelectedDivision] = useState<number | undefined>(undefined);
-    const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
+    const [selectedDivision, setSelectedDivision] = useState<number | "all">("all");
+    const [selectedCategory, setSelectedCategory] = useState<number | "all">("all");
 
     const handleBestOfChange = (value: number) => {
         setSelectedBestOf(value);
@@ -37,8 +37,8 @@ const ResultsView: React.FC = () => {
 
     const overallScoreModels = matchesController.getChampionshipResults(
         selectedBestOf,
-        selectedDivision,
-        selectedCategory
+        selectedDivision === "all" ? undefined : Number(selectedDivision),
+        selectedCategory === "all" ? undefined : Number(selectedCategory)
     );
 
     return (
