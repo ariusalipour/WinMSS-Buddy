@@ -113,7 +113,7 @@ const MergeView: React.FC = () => {
                 <Row key={index} style={{ marginBottom: "16px" }} align="middle">
                     <Col span={10}>
                         <Select
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", pointerEvents: merge.prepopulated ? "none" : "auto" }}
                             placeholder="Select main competitor"
                             value={merge.mainId ? `${competitors.find(c => c.memberId === merge.mainId)?.firstname} ${competitors.find(c => c.memberId === merge.mainId)?.lastname}` : undefined}
                             onChange={value => handleMainChange(index, competitors.find(c => `${c.firstname} ${c.lastname}` === value)?.memberId || 0)}
@@ -125,7 +125,6 @@ const MergeView: React.FC = () => {
                                 }
                                 return false;
                             }}
-                            disabled={merge.prepopulated}
                         >
                             {competitors
                                 .filter(c => !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))
@@ -139,7 +138,7 @@ const MergeView: React.FC = () => {
                     <Col span={10}>
                         <Select
                             mode="multiple"
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", pointerEvents: merge.prepopulated ? "none" : "auto" }}
                             placeholder="Select competitors to merge"
                             value={merge.mergeIds.map(id => `${competitors.find(c => c.memberId === id)?.firstname} ${competitors.find(c => c.memberId === id)?.lastname}`)}
                             onChange={value => handleMergeChange(index, value.map(name => competitors.find(c => `${c.firstname} ${c.lastname}` === name)?.memberId || 0))}
@@ -151,7 +150,6 @@ const MergeView: React.FC = () => {
                                 }
                                 return false;
                             }}
-                            disabled={merge.prepopulated}
                         >
                             {competitors
                                 .filter(c => c.memberId !== merge.mainId && !mergedIntoIds.includes(c.memberId) && !mergedCompetitorIds.includes(c.memberId))
