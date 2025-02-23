@@ -22,7 +22,7 @@ const CompetitorsTab: React.FC<CompetitorsTabProps> = ({ match, matchesControlle
                     title: "Member ID",
                     dataIndex: "memberId",
                     key: "memberId",
-                    sorter: (a, b) => a.memberId - b.memberId,
+                    sorter: (a, b) => a.competitorId - b.competitorId,
                 },
                 {
                     title: "First Name",
