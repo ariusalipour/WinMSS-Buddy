@@ -5,7 +5,7 @@ export class InfoController {
         // Hard-coded information about the application
         return {
             developerName: "Mockachino (Aryan Alipour)", // Replace with actual developer name
-            emailAddress: "your.email@example.com", // Replace with actual email
+            emailAddress: "aryan@mockachino.co.uk", // Replace with actual email
             appName: "WinMSS Buddy",
             appVersion: "1.0.0",
             appDescription: "A tool designed to help analyze and manage shooting match data from WinMSS files.",
