@@ -1,4 +1,6 @@
 export interface OverallScoreModel {
+    matchName: string;
+    memberId: number;
     position: number;
     firstName: string;
     lastName: string;

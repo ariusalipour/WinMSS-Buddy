@@ -12,6 +12,9 @@ import { SquadModel } from "../models/SquadModel";
 import { ScoreModel } from "../models/ScoreModel";
 import {ApiResponse} from "../models/ApiResponse.ts";
 import {OverallScoreModel} from "../models/OverallScoreModel.ts";
+import {getCategoryString} from "../mappings/CategoryMappings.ts";
+import {getDivisionString} from "../mappings/DivisionMappings.ts";
+import {ResultsModel} from "../models/ResultsModel.ts";
 
 export class MatchesController {
     private matches: Match[];
@@ -117,14 +120,26 @@ export class MatchesController {
         }));
     }
 
-    getUniqueDivisions(matchId: number): number[] {
+    getUniqueDivisions(matchId?: number): number[] {
+        if (matchId === undefined) {
+            return this.registrations
+                .map(reg => reg.divisionId)
+                .filter((value, index, self) => self.indexOf(value) === index);
+        }
+
         return this.registrations
             .filter(reg => reg.matchId === matchId)
             .map(reg => reg.divisionId)
             .filter((value, index, self) => self.indexOf(value) === index);
     }
 
-    getUniqueCategories(matchId: number): number[] {
+    getUniqueCategories(matchId?: number): number[] {
+        if (matchId === undefined) {
+            return this.registrations
+                .map(reg => reg.categoryId)
+                .filter((value, index, self) => self.indexOf(value) === index);
+        }
+
         return this.registrations
             .filter(reg => reg.matchId === matchId)
             .map(reg => reg.categoryId)
@@ -184,11 +199,11 @@ export class MatchesController {
             position: index + 1,
             firstName: s.competitor?.firstname || "",
             lastName: s.competitor?.lastname || "",
-            category: s.registration?.categoryId?.toString() || "",
+            category: getCategoryString(s.registration?.categoryId),
             percentage: s.percentage,
             points: s.finalScore,
             time: s.shootTime,
-            division: s.registration?.divisionId?.toString() || "",
+            division: getDivisionString(s.registration?.divisionId),
             alpha: s.scoreA,
             beta: s.scoreB,
             charlie: s.scoreC,
@@ -212,6 +227,7 @@ export class MatchesController {
         const overallScores = allScores.reduce((acc, score) => {
             const key = `${score.firstName}-${score.lastName}-${score.category}-${score.division}`;
             if (!acc[key]) {
+                // @ts-ignore
                 acc[key] = { ...score, totalPoints: 0, totalTime: 0, totalAlpha: 0, totalBeta: 0, totalCharlie: 0, totalDelta: 0, totalMike: 0, totalPenalty: 0, totalProcedural: 0, totalStagePoints: 0 };
             }
             acc[key].totalPoints += score.points;
@@ -225,21 +241,23 @@ export class MatchesController {
             acc[key].totalProcedural += score.procedural;
             acc[key].totalStagePoints += score.stagePoints;
             return acc;
-        }, {} as { [key: string]: ScoreModel & { totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalProcedural: number; totalStagePoints: number } });
+        }, {} as { [key: string]: { firstName: string; lastName: string; category: number; division: number; class: string; powerFactor: string; totalPoints: number; totalTime: number; totalAlpha: number; totalBeta: number; totalCharlie: number; totalDelta: number; totalMike: number; totalPenalty: number; totalProcedural: number; totalStagePoints: number } });
 
         const highestStagePoints = Math.max(...Object.values(overallScores).map(s => s.totalStagePoints));
 
         const sortedOverallScores = Object.values(overallScores).sort((a, b) => b.totalStagePoints - a.totalStagePoints);
 
         return sortedOverallScores.map((s, index) => ({
+            matchName: this.matches.find(m => m.matchId === matchId)?.matchName || "",
+            memberId: this.competitors.find(c => c.firstname === s.firstName && c.lastname === s.lastName)?.memberId || 0,
             position: index + 1,
             firstName: s.firstName,
             lastName: s.lastName,
-            category: s.category,
+            category: getCategoryString(s.category),
             percentage: ((s.totalStagePoints / highestStagePoints) * 100).toFixed(2),
             points: s.totalPoints,
             time: s.totalTime,
-            division: s.division,
+            division: getDivisionString(s.division),
             class: s.class,
             powerFactor: s.powerFactor,
             alpha: s.totalAlpha,
@@ -252,5 +270,57 @@ export class MatchesController {
             stagePoints: s.totalStagePoints,
             key: `${s.firstName}-${s.lastName}-${s.category}-${s.division}`
         }));
+    }
+
+    getChampionshipResults(bestof: number, divisionId?: number, categoryId?: number): ResultsModel[] {
+        const results: ResultsModel[] = [];
+
+        // get all matches
+        const matches = this.getMatches();
+
+        // get all match overall scores
+        const competitorScores: { [key: string]: OverallScoreModel[] } = {};
+
+        matches.forEach(match => {
+            const overallScores = this.getOverallScores(match.matchId, divisionId, categoryId);
+            overallScores.forEach(score => {
+                const key = `${score.firstName}-${score.lastName}-${score.category}-${score.division}`;
+                if (!competitorScores[key]) {
+                    competitorScores[key] = [];
+                }
+                competitorScores[key].push(score);
+            });
+        });
+
+        // Calculate best scores based on the 'bestof' parameter
+        Object.values(competitorScores).forEach(scores => {
+            scores.sort((a, b) => b.stagePoints - a.stagePoints);
+            const bestScores = scores.slice(0, bestof);
+            const totalPercentage = bestScores.reduce((sum, score) => sum + parseFloat(score.percentage), 0);
+
+            results.push({
+                memberId: bestScores[0].memberId,
+                firstName: bestScores[0].firstName,
+                lastName: bestScores[0].lastName,
+                division: bestScores[0].division,
+                category: bestScores[0].category,
+                position: 0, // Position will be calculated later
+                percentage: "", // Percentage will be calculated later
+                percentageScore: totalPercentage.toFixed(2),
+                matchResults: bestScores.map(score => ({ matchName: score.matchName, percentage: score.percentage }))
+            });
+        });
+
+        // Find the highest percentageScore
+        const highestPercentageScore = Math.max(...results.map(result => parseFloat(result.percentageScore)));
+
+        // Sort results by percentageScore and calculate positions and percentages
+        results.sort((a, b) => parseFloat(b.percentageScore) - parseFloat(a.percentageScore));
+        results.forEach((result, index) => {
+            result.position = index + 1;
+            result.percentage = ((parseFloat(result.percentageScore) / highestPercentageScore) * 100).toFixed(2);
+        });
+
+        return results;
     }
 }

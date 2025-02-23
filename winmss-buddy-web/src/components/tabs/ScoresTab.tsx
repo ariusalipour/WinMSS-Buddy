@@ -3,6 +3,8 @@ import { Table, Select } from "antd";
 import { ScoreModel } from "../../models/ScoreModel";
 import { MatchesController } from "../../controllers/MatchesController";
 import { MatchModel } from "../../models/MatchModel";
+import {getCategoryString} from "../../mappings/CategoryMappings.ts";
+import {getDivisionString} from "../../mappings/DivisionMappings.ts";
 
 const { Option } = Select;
 
@@ -78,7 +80,7 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                     </Option>
                     {uniqueDivisions.map((division) => (
                         <Option key={division} value={division}>
-                            {division}
+                            {getDivisionString(division)}
                         </Option>
                     ))}
                 </Select>
@@ -93,7 +95,7 @@ const ScoresTab: React.FC<ScoresTabProps> = ({ match, matchesController }) => {
                     </Option>
                     {uniqueCategories.map((category) => (
                         <Option key={category} value={category}>
-                            {category}
+                            {getCategoryString(category)}
                         </Option>
                     ))}
                 </Select>

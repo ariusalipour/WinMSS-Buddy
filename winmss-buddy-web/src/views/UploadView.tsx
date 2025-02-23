@@ -70,7 +70,7 @@ const UploadView: React.FC = () => {
 
     return (
         <div>
-            <Title level={2}>Upload WinMSS Data</Title>
+            <Title>Upload WinMSS Data</Title>
             <Paragraph>
                 Drag and drop .cab files here, or click to browse and upload one or more files.
             </Paragraph>
