@@ -20,18 +20,18 @@ const ResultsView: React.FC = () => {
     const numberOfMatches = matchesController.getMatches().length;
 
     const [selectedBestOf, setSelectedBestOf] = useState<number>(1);
-    const [selectedDivision, setSelectedDivision] = useState<number | "all">("all");
-    const [selectedCategory, setSelectedCategory] = useState<number | "all">("all");
+    const [selectedDivision, setSelectedDivision] = useState<string | "all">("all");
+    const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
 
     const handleBestOfChange = (value: number) => {
         setSelectedBestOf(value);
     };
 
-    const handleDivisionChange = (value: number) => {
+    const handleDivisionChange = (value: string) => {
         setSelectedDivision(value);
     };
 
-    const handleCategoryChange = (value: number) => {
+    const handleCategoryChange = (value: string) => {
         setSelectedCategory(value);
     };
 
