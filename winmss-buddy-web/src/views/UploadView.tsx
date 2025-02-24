@@ -1,5 +1,4 @@
-// src/views/UploadView.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Upload, Typography, message, List, Progress, Button } from "antd";
 import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
 import { useAppContext } from "../context/AppContext";
@@ -18,15 +17,17 @@ const UploadView: React.FC = () => {
     const { setApiResponse } = useAppContext();
     const [fileList, setFileList] = useState<FileProgress[]>([]);
     const [uploading, setUploading] = useState<boolean>(false);
-    // Local state to hold match names returned by the controller.
-    const [matchNames, setMatchNames] = useState<
-        { matchId: number; matchName: string }[]
-    >([]);
+    const [matchNames, setMatchNames] = useState<{ matchId: number; matchName: string }[]>([]);
 
-    // Instantiate the UploadController and pass the AppContext updater.
     const uploadController = new UploadController(setApiResponse);
 
-    // Handle file selection. Returning false prevents the default upload behavior.
+    useEffect(() => {
+        const savedMatchNames = localStorage.getItem("matchNames");
+        if (savedMatchNames) {
+            setMatchNames(JSON.parse(savedMatchNames));
+        }
+    }, []);
+
     const handleFileChange = (file: File) => {
         setFileList((prev) => [...prev, { file, progress: 0, status: "active" }]);
         return false;
@@ -41,22 +42,18 @@ const UploadView: React.FC = () => {
         setUploading(true);
 
         try {
-            // Instantly mark the progress bars as successful.
             setFileList((prev) =>
                 prev.map((fp) => ({ ...fp, progress: 100, status: "success" }))
             );
 
-            // Extract the File objects.
             const filesToUpload = fileList.map((fp) => fp.file);
-
-            // Upload files via the controller and get back match names.
             const returnedMatchNames = await uploadController.uploadFiles(filesToUpload);
 
-            // Save the returned match names in local state.
             setMatchNames(returnedMatchNames);
+            localStorage.setItem("matchNames", JSON.stringify(returnedMatchNames));
 
             message.success("Files uploaded and processed successfully!");
-            setFileList([]); // Clear file list after a successful upload.
+            setFileList([]);
         } catch (error) {
             console.error("Error uploading files:", error);
             setFileList((prev) =>
@@ -77,7 +74,7 @@ const UploadView: React.FC = () => {
             <Dragger
                 multiple
                 beforeUpload={handleFileChange}
-                fileList={[]} // Managed manually via state.
+                fileList={[]}
                 showUploadList={false}
                 style={{
                     padding: "20px",
@@ -97,7 +94,6 @@ const UploadView: React.FC = () => {
                 </p>
             </Dragger>
 
-            {/* Display selected files with progress */}
             {fileList.length > 0 && (
                 <div style={{ marginTop: "24px" }}>
                     <Title level={3}>Selected Files</Title>
@@ -125,7 +121,6 @@ const UploadView: React.FC = () => {
                 </div>
             )}
 
-            {/* Display the imported match names */}
             {matchNames.length > 0 && (
                 <div style={{ marginTop: "24px" }}>
                     <Title level={3}>Imported Matches</Title>
