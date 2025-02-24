@@ -1,9 +1,10 @@
-import { Select, Table, Typography } from "antd";
+import { Select, Table, Typography, Button } from "antd";
 import { useMatchesController } from "../hooks/useMatchesController.ts";
 import React, { useState } from "react";
 import { MatchResult, ResultsModel } from "../models/ResultsModel.ts";
 import { getCategoryString } from "../mappings/CategoryMappings.ts";
 import { getDivisionString } from "../mappings/DivisionMappings.ts";
+import Papa from "papaparse";
 
 const { Option } = Select;
 const { Title, Paragraph } = Typography;
@@ -40,6 +41,31 @@ const ResultsView: React.FC = () => {
         selectedDivision === "all" ? undefined : Number(selectedDivision),
         selectedCategory === "all" ? undefined : Number(selectedCategory)
     );
+
+    const handleExportCSV = () => {
+        const csvData = overallScoreModels.map(result => ({
+            Position: result.position,
+            Percentage: result.percentage,
+            Competitor: result.memberId,
+            "First Name": result.firstName,
+            "Last Name": result.lastName,
+            Division: result.division,
+            Category: result.category,
+            "Overall Score": result.percentageScore,
+            "Match Results": result.matchResults.map((matchResult: MatchResult) => `${matchResult.matchName}: ${matchResult.percentage}`).join("; ")
+        }));
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "results.csv");
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <div>
@@ -87,6 +113,9 @@ const ResultsView: React.FC = () => {
                         </Option>
                     ))}
                 </Select>
+                <Button type="primary" onClick={handleExportCSV} style={{ marginBottom: "16px" }}>
+                    Export as CSV
+                </Button>
             </div>
             <Table<ResultsModel>
                 dataSource={overallScoreModels}
